@@ -1,0 +1,4257 @@
+
+//DONT HAVE THIS IN RETAIL WE NEED TO BRIDGE
+
+//DONT HAVE THIS BELOW THIS IN RETAIL WE NEED TO BRIDGE FIRST
+
+
+ /* NEW: Transfer tokens to the contract
+  console.log("\n--- Token Transfer Section ---");
+  const transferAmount = "20328200000000000000000000"; // Your specified amount
+  
+  try {
+    console.log(`Transferring ${transferAmount} tokens to contract...`);
+    
+    // Transfer tokens to the deployed contract address
+    const transferTx = await token.transfer(tokenAddress, transferAmount, {
+      gasPrice: doubledGasPrice
+    });
+    
+    console.log(`Transfer transaction hash: ${transferTx.hash}`);
+    console.log("Waiting for transfer transaction to be mined...");
+    await transferTx.wait();
+    
+    // Check the contract's token balance
+    const contractBalance = await token.balanceOf(tokenAddress);
+    console.log(`Contract token balance: ${contractBalance.toString()}`);
+    
+  } catch (error) {
+    console.error("Error during token transfer:", error.message);
+  }
+
+
+
+
+  */
+
+const hre = require("hardhat");
+// Define a sleep function
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function main() {
+  const POSITION_MANAGER_ADDRESS = "0x4B2C77d209D3405F41a037Ec6c77F7F5b8e2ca80"; // Replace with actual V4 address
+
+  console.log("Deploying B0x_Mainnet contract...");
+  
+    // Get the deployer's address
+    const [deployer] = await hre.ethers.getSigners();
+    console.log(`Deploying with account: ${deployer.address}`);
+
+  // Get current fee data using hre (Hardhat Runtime Environment)
+  let gasPrice;
+  try {
+    // For Hardhat with ethers v6
+    const feeData = await hre.ethers.provider.getFeeData();
+    gasPrice = feeData.gasPrice;
+  } catch (error) {
+    try {
+      // Fallback for Hardhat with ethers v5
+      gasPrice = await hre.ethers.provider.getGasPrice();
+    } catch (error) {
+      console.log("Error getting gas price, using network default");
+      // Let Hardhat use the default from config
+      gasPrice = undefined;
+    }
+  }
+
+
+  let doubledGasPrice;
+if (gasPrice) {
+  // Check if it's a BigNumber (ethers v5) or a BigInt (ethers v6)
+  if (typeof gasPrice === 'bigint') {
+    // It's a BigInt (ethers v6), use BigInt multiplication
+    doubledGasPrice = gasPrice * 2n; // Note the 'n' suffix for BigInt literals
+    console.log(`Using doubled gas price: ${doubledGasPrice}`);
+  } else if (gasPrice.mul) {
+    // It's a BigNumber (ethers v5), use the mul method
+    doubledGasPrice = gasPrice.mul(2);
+    console.log(`Using doubled gas price: ${doubledGasPrice.toString()}`);
+  } else {
+    // Fallback in case we can't determine the type
+    console.log("Unknown gasPrice type, using original gas price");
+    doubledGasPrice = gasPrice;
+  }
+}
+
+
+
+
+
+    
+
+    // Get contract factory
+    console.log("Getting Test0xBTC online");
+    const ZeroXBTC_TestNetContract = await hre.ethers.getContractFactory("Test0xBTC");
+    
+    // Deploy contract
+    console.log("Deploying tokens HooKMiner...");
+    const ZEROXBTC_TESTNETCONTRACT = await ZeroXBTC_TestNetContract.deploy( {
+  gasPrice: doubledGasPrice
+});
+    
+    // Wait for deployment
+    console.log("Waiting for deployment transaction to be mined...");
+    await ZEROXBTC_TESTNETCONTRACT.waitForDeployment();
+    
+    // Get the deployed address (ethers v6 way)
+    const Address_ZEROXBTC_TESTNETCONTRACT = await ZEROXBTC_TESTNETCONTRACT.getAddress();
+    console.log(`Test0xBTC deployed to: ${Address_ZEROXBTC_TESTNETCONTRACT}`);
+    
+    // Print verification command
+    console.log(`\nTo verify on Etherscan, run:`);
+    console.log(`npx hardhat verify --network baseSepolia ${Address_ZEROXBTC_TESTNETCONTRACT} \n\n`);
+
+    
+
+
+    
+    // Get contract factory
+    console.log("Getting contract factory...");
+    const B0xToken = await hre.ethers.getContractFactory("B0x_Mainnet");
+    
+
+
+    const token = await B0xToken.deploy(deployer.address, Address_ZEROXBTC_TESTNETCONTRACT, {
+  gasPrice: doubledGasPrice
+});
+    // Wait for deployment
+    console.log("Waiting for deployment transaction to be mined...");
+    await token.waitForDeployment();
+    
+    // Get the deployed address (ethers v6 way)
+    const tokenAddress = await token.getAddress();
+    console.log(`Token deployed to: ${tokenAddress}`);
+    
+    // Print verification command
+    console.log(`\nTo verify on Etherscan, run: `);
+    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress} "${deployer.address}" "${ZeroXBTC_TestNetContract}" \n\n`);
+    
+var rightsTo0xBitcoinAddress;
+try{
+        // Call the getter function for the public immutable variable
+        const rightsAddress = await token._RightsTo0xBitcoin_Address();
+        
+        console.log('_RightsTo0xBitcoin_Address:', rightsAddress);
+        rightsTo0xBitcoinAddress= rightsAddress;
+        
+    } catch (error) {
+        console.error('Error reading contract variable:', error);
+        throw error;
+    }
+
+    console.log(`\nTo verify RightsTo0xBTC on Etherscan, run: `);
+    console.log(`npx hardhat verify --network baseSepolia ${rightsTo0xBitcoinAddress} \n\n`);
+    
+
+    
+// Ensure both addresses are properly formatted (lowercase)
+const addr1 = Address_ZEROXBTC_TESTNETCONTRACT.toLowerCase();
+const addr2 = tokenAddress.toLowerCase();
+
+
+if (BigInt(addr1) > BigInt(addr2)) {
+    console.log("Failed Zerox greater than B0x");
+    await main();
+    return;
+}
+
+
+
+
+    // Get contract factory
+    console.log("Getting contract factory... HooKMiner");
+    const Univ4Hook_Contract = await hre.ethers.getContractFactory("HookMiner");
+    
+    // Deploy contract
+    console.log("Deploying tokens HooKMiner...");
+    const UniV4Hook = await Univ4Hook_Contract.deploy( {
+  gasPrice: doubledGasPrice
+});
+    
+    // Wait for deployment
+    console.log("Waiting for deployment transaction to be mined...");
+    await UniV4Hook.waitForDeployment();
+    
+    // Get the deployed address (ethers v6 way)
+    const Address_Univ4HookMiner = await UniV4Hook.getAddress();
+    console.log(`Address_Univ4HookMiner deployed to: ${Address_Univ4HookMiner}`);
+    
+    // Print verification command
+    console.log(`\nTo verify on Etherscan, run:`);
+    console.log(`npx hardhat verify --network baseSepolia ${Address_Univ4HookMiner} \n\n`);
+
+    
+
+
+
+    console.log("Calling findValidSalt function...");
+    let startSalt = 0;
+    const maxAttempts = 5000;
+
+    // Use 'let' instead of 'int' for the loop variable
+    // Add proper spacing in the for loop condition
+    // Add missing closing parenthesis
+    let HookAddress;
+    let validSaltz = 0;
+    for(let x = 0; x < 110; x++) {
+      sleep(2000);
+      // Update startSalt for each iteration
+      startSalt = maxAttempts * x;
+      
+      try {
+        // Call the view function
+        const result = await UniV4Hook.findValidSalt(startSalt, maxAttempts);
+        
+        // Since the function returns multiple values, you can destructure them
+        const [validSalt, predictedAddress] = result;
+        
+        console.log(`Iteration ${x}:`);
+        console.log(`Found valid salt: ${validSalt}`);
+        console.log(`Predicted hook address: ${predictedAddress}`);
+        validSaltz = validSalt; 
+        HookAddress = predictedAddress;
+        break;
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding valid salt in iteration ${x}:`, error);
+      }
+    }
+
+
+
+    console.log("Done checking for hook addresses we got one hopefully, Salt: ", validSaltz, "   HOOK ADDY: ",HookAddress);
+
+
+
+    // Deploy the hook with the found salt
+    try {
+      console.log("Deploying the hook using salt:", validSaltz);
+      
+      // IMPORTANT: deployHook is a STATE-CHANGING function (not a view function)
+      // It needs to be treated as a transaction
+      console.log("Sending deployHook transaction...");
+      const tx = await UniV4Hook.deployHook(validSaltz, {
+  gasPrice: doubledGasPrice
+});
+      
+      console.log("Hook deployment transaction sent:", tx.hash);
+      console.log("Waiting for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("Hook deployment transaction confirmed in block:", receipt.blockNumber);
+      
+      // Try to extract the deployed address from events if the contract emits them
+      // Example: If there's a DeployedHook(address hookAddress) event
+      try {
+        // Look for the event that might contain the hook address
+        // This is contract-specific - you need to check your contract's events
+        console.log("Looking for hook address in transaction events...");
+        
+        if (receipt.logs && receipt.logs.length > 0) {
+          // Try to decode events from the receipt logs
+          // This approach depends on your contract's event structure
+          console.log("Transaction has", receipt.logs.length, "logs");
+          
+          // Alternatively, you might need to use the interface to parse events
+          // const iface = new ethers.utils.Interface(["event DeployedHook(address hookAddress)"]);
+          // const events = receipt.logs.map(log => iface.parseLog(log));
+          
+          // For now, let's stick with the predicted address
+          console.log("Using predicted hook address:", HookAddress);
+        } else {
+          console.log("No logs found in receipt, using predicted address:", HookAddress);
+        }
+      } catch (eventError) {
+        console.log("Could not parse events, using predicted address:", HookAddress);
+      }
+      
+    } catch (error) {
+      console.error("Error deploying hook:", error);
+      console.log("Continuing with the predicted address:", HookAddress);
+      // Continue with the predicted address if deployment fails
+    }
+
+
+      console.log("HOOK DEPLOYED TO HOOKADDRESS: ",HookAddress );
+
+        console.log(`npx hardhat verify --network baseSepolia ${HookAddress} "${deployer.address}" `);
+
+      console.log("HOOK DEPLOYED TO HOOKADDRESS: ",HookAddress, "\n\n");
+
+
+
+
+
+
+
+    // Get contract factory
+    console.log("Getting contract factory... LP Rewards");
+    const B0xToken_Rewards = await hre.ethers.getContractFactory("B0x_LP_Rewards");
+    
+    // Deploy contract
+    console.log("Deploying tokens Rewards LP Rewards...");
+    const LPRewards = await B0xToken_Rewards.deploy(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, HookAddress, {
+  gasPrice: doubledGasPrice
+});
+    
+    // Wait for deployment
+    console.log("Waiting for deployment transaction to be mined...");
+    await LPRewards.waitForDeployment();
+    
+    // Get the deployed address (ethers v6 way)
+    const tokenAddress_Rewards = await LPRewards.getAddress();
+    console.log(`tokenAddress_Rewards deployed to: ${tokenAddress_Rewards}`);
+    
+    // Print verification command
+    console.log(`\nTo verify on Etherscan, run:`);
+  console.log(`npx hardhat verify --network baseSepolia ${tokenAddress_Rewards} "${tokenAddress}" \n\n`);
+
+
+
+
+
+
+    // Get contract factory
+    console.log("Getting contract factory... POW!");
+    const B0xToken_POW = await hre.ethers.getContractFactory("B0x_Mining_Proof_of_Work");
+    
+    // Deploy contract
+    console.log("Deploying tokens ProofOFWork...");
+    const tokenPOW = await B0xToken_POW.deploy(tokenAddress, tokenAddress_Rewards, {
+  gasPrice: doubledGasPrice
+});
+    
+    // Wait for deployment
+    console.log("Waiting for deployment transaction to be mined...");
+    await tokenPOW.waitForDeployment();
+    
+    // Get the deployed address (ethers v6 way)
+    const tokenAddress_Proof_Of_Work = await tokenPOW.getAddress();
+    console.log(`tokenAddress_Proof_Of_Work deployed to: ${tokenAddress_Proof_Of_Work}`);
+    
+    // Print verification command
+    console.log(`\nTo verify on Etherscan, run:`);
+    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress_Proof_Of_Work} "${tokenAddress}" "${tokenAddress_Rewards}"`);
+
+    
+
+    // Get contract factory
+    console.log("Getting contract factory... NFT721!");
+    const DummyNFT721 = await hre.ethers.getContractFactory("MyERC721");
+    
+    // Deploy contract
+    console.log("Deploying tokens NFT721...");
+    const NFT721 = await DummyNFT721.deploy("Test721NFT", "T721", "https://forgetoken.org/img/gem.png", tokenAddress_Proof_Of_Work, {
+  gasPrice: doubledGasPrice
+});
+    
+    // Wait for deployment
+    console.log("Waiting for deployment transaction to be mined...");
+    await NFT721.waitForDeployment();
+    
+    // Get the deployed address (ethers v6 way)
+    const NFT721Address = await NFT721.getAddress();
+    console.log(`NFT721 Address deployed to: ${NFT721Address}`);
+    
+    // Print verification command
+    console.log(`\nTo verify on Etherscan, run:`);
+    console.log(`npx hardhat verify --network baseSepolia ${NFT721Address} "Test721NFT" "T721" "https://forgetoken.org/img/gem.png" "${tokenAddress_Proof_Of_Work}"`);
+
+    
+
+    // Get contract factory
+    console.log("Getting contract factory... NFT1155!");
+    const DummyNFT1155  = await hre.ethers.getContractFactory("MyERC1155");
+    
+    // Deploy contract
+    console.log("Deploying tokens NFT1155...");
+    const NFT1155 = await DummyNFT1155.deploy("https://forgetoken.org/img/gem.png", tokenAddress_Proof_Of_Work, {
+  gasPrice: doubledGasPrice
+});
+    
+    // Wait for deployment
+    console.log("Waiting for deployment transaction to be mined...");
+    await NFT1155.waitForDeployment();
+    
+    // Get the deployed address (ethers v6 way)
+    const NFT1155Address = await NFT1155.getAddress();
+    console.log(`NFT1155Address deployed to: ${NFT1155Address}`);
+    
+    // Print verification command
+    console.log(`\nTo verify on Etherscan, run:`);
+    console.log(`npx hardhat verify --network baseSepolia ${NFT1155Address} "https://forgetoken.org/img/gem.png" "${tokenAddress_Proof_Of_Work}"`);
+
+    
+
+
+
+     try {
+        // Call the view function
+
+        const tx = await LPRewards.setPOW_Contract(tokenAddress_Proof_Of_Work, {
+  gasPrice: doubledGasPrice
+});
+        //const tx = await tokenSwapper.getUnsiwapv4Fees( NFTTOkenID, tokenAddress, deployer.address);
+        
+        
+      console.log("setPOW_Contract setPOW_Contract tx sent:", tx.hash);
+         
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding getUnsiwapv4Fees`, error);
+      }
+
+      console.log("setPOW_Contract: ", tokenAddress_Proof_Of_Work);
+
+
+
+
+
+     try {
+        // Call the view function
+
+        const tx = await LPRewards.setupAddTokens({
+  gasPrice: doubledGasPrice
+});
+        //const tx = await tokenSwapper.getUnsiwapv4Fees( NFTTOkenID, tokenAddress, deployer.address);
+        
+        
+      console.log("setupAddTokens setupAddTokens tx sent:", tx.hash);
+         
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding setupAddTokens`, error);
+      }
+
+      console.log("setupAddTokens was successful!");
+
+
+
+
+
+
+//DONT HAVE THIS IN RETAIL WE NEED TO BRIDGE
+
+//DONT HAVE THIS IN RETAIL WE NEED TO BRIDGE FIRST
+
+
+ // NEW: Transfer tokens to the contract
+  console.log("\n--- Token Transfer Section ---");
+  const transferAmount = "20328200000000000000000000"; // Your specified amount
+  
+  try {
+    console.log(`Transferring ${transferAmount} tokens to contract...`);
+    
+    // Transfer tokens to the deployed contract address
+    const transferTx = await token.transfer(tokenAddress_Proof_Of_Work, transferAmount, {
+      gasPrice: doubledGasPrice
+    });
+    
+    console.log(`Transfer transaction hash: ${transferTx.hash}`);
+    console.log("Waiting for transfer transaction to be mined...");
+    await transferTx.wait();
+    
+    // Check the contract's token balance
+    const contractBalance = await token.balanceOf(tokenAddress_Proof_Of_Work);
+    console.log(`Contract token balance: ${contractBalance.toString()}`);
+    
+  } catch (error) {
+    console.error("Error during token transfer:", error.message);
+  }
+
+
+
+  try {
+    console.log(`Calling OpenMining!!!!`);
+    
+    // Transfer tokens to the deployed contract address
+    const transferTx = await tokenPOW.openMining( {
+      gasPrice: doubledGasPrice
+    });
+    
+    console.log(`OpenMining called transaction hash: ${transferTx.hash}`);
+    console.log("Waiting for OpenMining called transaction to be mined...");
+    await transferTx.wait();
+    
+    
+  } catch (error) {
+    console.error("Error during OpenMining called:", error.message);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // Get contract factory
+    console.log("Getting contract factory... PoolMaker!");
+    const B0xToken_CreatePool = await hre.ethers.getContractFactory("UniswapV4PoolCreator");
+    
+    // Deploy contract
+    console.log("Deploying tokens ProofOFWork...");
+    const tokenPooLCreator = await B0xToken_CreatePool.deploy(tokenAddress, {
+  gasPrice: doubledGasPrice
+});
+    
+    // Wait for deployment
+    console.log("Waiting for deployment transaction to be mined...");
+    await tokenPooLCreator.waitForDeployment();
+    
+    // Get the deployed address (ethers v6 way)
+    const address_tokenPooLCreator = await tokenPooLCreator.getAddress();
+    console.log(`tokenAddress_Proof_Of_Work deployed to: ${address_tokenPooLCreator}`);
+    
+    // Print verification command
+    console.log(`\nTo verify on Etherscan, run:`);
+    console.log(`npx hardhat verify --network baseSepolia ${address_tokenPooLCreator} \n\n`);
+
+    
+
+
+//const startingX96PriceFor2000to1 = 3543191142285914378072636784640n;
+     try {
+  // Call the view function
+        const tx = await tokenPooLCreator.createNewPool(Address_ZEROXBTC_TESTNETCONTRACT, tokenAddress, HookAddress, {
+  gasPrice: doubledGasPrice
+});
+         console.log("Sending createNewPool transaction...");
+
+      console.log("createNewPool transaction sent:", tx.hash);
+      console.log("Waiting for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("createNewPool transaction confirmed in block:", receipt.blockNumber);
+      
+      
+
+      } catch (error) {
+        console.error(`Error createNewPool`, error);
+      }
+
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // Get contract factory
+    console.log("Getting contract factory... Univ4MakeSwap!");
+    const B0xToken_Swap = await hre.ethers.getContractFactory("UniswapV4Swap");
+    
+    // Deploy contract
+    console.log("Deploying tokens Univ4MakeSwap...");
+    const tokenSwapper = await B0xToken_Swap.deploy({
+  gasPrice: doubledGasPrice
+});
+    
+    // Wait for deployment
+    console.log("Waiting for deployment transaction to be mined...");
+    await tokenSwapper.waitForDeployment();
+    
+    // Get the deployed address (ethers v6 way)
+    const tokenAddress_Swapper= await tokenSwapper.getAddress();
+    console.log(`Univ4MakeSwap deployed to: ${tokenAddress_Swapper}`);
+    
+    // Print verification command
+    console.log(`\nTo verify on Etherscan, run:`);
+    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress_Swapper} "${tokenAddress_Rewards}"`);
+
+    
+
+
+
+    // Get contract factory
+    console.log("Getting contract factory... positionFinderPro!");
+    const positionFinderExpert = await hre.ethers.getContractFactory("positionFinderPro");
+    
+    // Deploy contract
+    console.log("Deploying positionFinderPro positionFinderPro...");
+    const positionFinder = await positionFinderExpert.deploy(tokenAddress_Rewards, {
+  gasPrice: doubledGasPrice
+});
+    
+    // Wait for deployment
+    console.log("Waiting for deployment transaction to be mined...");
+    await positionFinder.waitForDeployment();
+    
+    // Get the deployed address (ethers v6 way)
+    const tokenAddress_PositionFinder= await positionFinder.getAddress();
+    console.log(`positionFinderPro deployed to: ${tokenAddress_PositionFinder}`);
+    
+    // Print verification command
+    console.log(`\nTo verify on Etherscan, run:`);
+    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress_PositionFinder} "${tokenAddress_Rewards}"`);
+
+    
+console.log("?????VERIFICATION SCRIPT BELOW!!!!!!");
+    
+console.log("?????VERIFICATION SCRIPT BELOW!!!!!!");
+    
+console.log("?????VERIFICATION SCRIPT BELOW!!!!!!");
+
+
+
+    // Print verification command
+    console.log(`\nTo verify on Etherscan, run:`);
+
+
+    console.log(`Test0xBTC deployed to: ${Address_ZEROXBTC_TESTNETCONTRACT}`);
+    console.log(`npx hardhat verify --network baseSepolia ${Address_ZEROXBTC_TESTNETCONTRACT} \n`);
+
+    console.log(`Test B0xToken deployed to: ${tokenAddress}`);
+    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress} "${deployer.address}" "${Address_ZEROXBTC_TESTNETCONTRACT}" \n\n`);
+    
+
+
+    console.log(`\nTo verify RightsTo0xBTC on Etherscan, run: `);
+    console.log(`npx hardhat verify --network baseSepolia ${rightsTo0xBitcoinAddress} \n\n`);
+
+
+
+    // Print verification command
+      console.log("Uni v4 Hook Miner Deployed to Address: ",Address_Univ4HookMiner);
+    console.log(`npx hardhat verify --network baseSepolia ${Address_Univ4HookMiner} \n`);
+
+      console.log("HOOK DEPLOYED TO HOOKADDRESS: ",HookAddress);
+        console.log(`npx hardhat verify --network baseSepolia ${HookAddress} "${deployer.address}" \n\n`);
+
+
+    // Print verification command
+    console.log(`\nTo verify on Etherscan tokenAddress_Proof_Of_Work , run:`);
+    //MINING CONTRACT VERIFICATION NOT YET
+    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress_Proof_Of_Work} "${tokenAddress}" "${tokenAddress_Rewards}"`);
+
+    
+
+    
+    console.log(`NFT1155Address deployed to: ${NFT1155Address}`);
+    console.log(`npx hardhat verify --network baseSepolia ${NFT1155Address} "https://forgetoken.org/img/gem.png" "${tokenAddress_Proof_Of_Work}"\n`);
+
+    
+
+    console.log(`NFT721 Address deployed to: ${NFT721Address}`);
+    console.log(`npx hardhat verify --network baseSepolia ${NFT721Address} "Test721NFT" "T721" "https://forgetoken.org/img/gem.png" "${tokenAddress_Proof_Of_Work}"\n\n`);
+
+    
+    // Print verification command
+    console.log(`\nTo verify on Etherscan address_tokenPooLCreator , run:`);
+    console.log(`npx hardhat verify --network baseSepolia ${address_tokenPooLCreator} \n`);
+
+
+    console.log(`Univ4MakeSwap deployed to: ${tokenAddress_Swapper}`);
+    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress_Swapper} "${tokenAddress}" \n`);
+
+    console.log(`positionFinderPro deployed to: ${tokenAddress_PositionFinder}`);
+    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress_PositionFinder} "${tokenAddress_Rewards}" \n\n \n\n \n\n`);
+
+console.log("Done with setup SUPER SUCCESS EVERYTHING IS ONLINE NOW JUST FOR CHECKS WITH SWAPS");
+console.log("\n\n");
+
+console.log(`const USDCToken = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";`)
+console.log(`const positionManager_address = "0x4B2C77d209D3405F41a037Ec6c77F7F5b8e2ca80";`);
+console.log("const contractAddress_PositionFinderPro = '"+tokenAddress_PositionFinder+"'; // Replace with actual contract address")
+console.log("const contractAddress_Swapper = '"+tokenAddress_Swapper+"'; // Replace with actual contract address");
+console.log("const contractAddressLPRewardsStaking = '"+tokenAddress_Rewards+"';");
+console.log("const hookAddress = '"+HookAddress+"';");
+console.log("const ProofOfWorkAddresss = '"+tokenAddress_Proof_Of_Work+"';");
+
+console.log(`
+// Token addresses mapping
+const tokenAddresses = {
+'ETH': '0x0000000000000000000000000000000000000000', // Example addresses
+'B0x': '${tokenAddress}',
+'0xBTC': '${Address_ZEROXBTC_TESTNETCONTRACT}',
+'WETH': '0x4200000000000000000000000000000000000006',
+'RightsTo0xBTC': '${rightsTo0xBitcoinAddress}', //temp until mainnet
+'USDC': '0x036CbD53842c5426634e7929541eC2318f3dCF7e', //temp until mainnet
+};
+
+
+
+    const tokenMap = {
+        "0x4200000000000000000000000000000000000006": "WETH",
+        "0x0000000000000000000000000000000000000000": "ETH",
+        "${tokenAddress}": "B0x",
+        "${Address_ZEROXBTC_TESTNETCONTRACT}": "0xBTC",
+        "${rightsTo0xBitcoinAddress}": "RightsTo0xBTC", //temp until mainnet
+        "0x036CbD53842c5426634e7929541eC2318f3dCF7e": "USDC", //temp until mainnet
+        // Add more token mappings as needed
+    };
+
+
+   
+
+
+// Token addresses mapping FOR ETHEREUM MAINNET ONLY but using testnet base sepolia instead of mainnet ETH
+  const tokenAddressesETH = {
+      'ETH': '0x0000000000000000000000000000000000000000', // Example addresses
+      'B0x': '${tokenAddress}',
+      '0xBTC': '${Address_ZEROXBTC_TESTNETCONTRACT}',
+      'RightsTo0xBTC': '${rightsTo0xBitcoinAddress}',
+      };
+
+
+
+
+`);
+
+
+
+
+
+
+console.log("Sleep 11 seconds");
+await sleep(11* 1000);
+const amountToApprove = ethers.parseEther("20000000");  // Correctly represents 200 * 10^18
+     try {
+
+    console.log("Done Getting swapper stuff lets actually do something on chain");
+
+      // This approach uses the ABI from the contract factory and connects to the deployed address
+      const tokenContract = B0xToken.attach(tokenAddress);
+      
+      console.log(`Approving ${tokenAddress_Swapper} to spend ${amountToApprove} tokens...`);
+      const approveTx = await tokenContract.approve(tokenAddress_Swapper, amountToApprove, {
+  gasPrice: doubledGasPrice
+});
+      console.log("Waiting for approval transaction to be mined...");
+      await approveTx.wait();
+      console.log("Token approval successful!");
+
+      } catch (error) {
+        console.error(`Error finding approval swapper stuff`, error);
+      }
+
+
+    // Check the contract's token balance
+    const contractBalanceB0x = await token.balanceOf(tokenAddress_Swapper);
+    console.log(`Contract token balance contractBalanceB0x : ${contractBalanceB0x.toString()}`);
+    // Check the contract's token balance
+    const contractBalance0xBTC = await ZEROXBTC_TESTNETCONTRACT.balanceOf(tokenAddress_Swapper);
+    console.log(`Contract token balance: ${contractBalance0xBTC.toString()}`);
+
+    // Check the contract's token balance
+    const contractBalanceB0x2 = await token.balanceOf(deployer.address);
+    console.log(`Users token balance B0x : ${contractBalanceB0x2.toString()}`);
+    // Check the contract's token balance
+    const contractBalance0xBTC2 = await ZEROXBTC_TESTNETCONTRACT.balanceOf(deployer.address);
+    console.log(`Users token balance 0xBTC:  ${contractBalance0xBTC2.toString()}`);
+
+
+
+    try {
+
+    console.log("Done ZEROXBTC_TESTNETCONTRACT approved stuff lets actually do something on chain");
+
+      
+      console.log(`Approving ${Address_ZEROXBTC_TESTNETCONTRACT} to spend ${amountToApprove} tokens...`);
+      const approveTx = await ZEROXBTC_TESTNETCONTRACT.approve(tokenAddress_Swapper, amountToApprove, {
+  gasPrice: doubledGasPrice
+});
+      console.log("Waiting for approval transaction to be mined...");
+      await approveTx.wait();
+      console.log("ZEROXBTC_TESTNETCONTRACT Token approval successful!");
+
+      } catch (error) {
+        console.error(`Error finding approval swapper stuff`, error);
+      }
+
+
+
+await sleep(15);
+
+
+let Current_getsqrtPricex96=0;
+
+      try {
+        // Call the view function
+        const result = await tokenSwapper.getsqrtPricex96(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, HookAddress);
+
+
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          
+          if (typeof result === 'bigint' || typeof result === 'number') {
+            // If it's already a primitive value
+            Current_getsqrtPricex96 = result;
+          } else if (result._isBigNumber || result instanceof ethers.BigNumber) {
+            // For ethers v5 BigNumber
+            Current_getsqrtPricex96 = result;
+          } else if (typeof result === 'object' && result !== null) {
+            // For objects, try to extract the value
+            // With ethers v6, we might get the value directly
+            if (typeof result.toString === 'function' && result.toString().match(/^[0-9]+$/)) {
+              Current_getsqrtPricex96 = result;
+            } else {
+              // Attempt to extract value based on common patterns
+              Current_getsqrtPricex96 = result[0] || result.amountOut || result._hex || result.value || result;
+            }
+          }
+          
+          console.log(`Found valid Current_getsqrtPricex96 x10**18: ${Current_getsqrtPricex96.toString()}`);
+          // Format to display as a readable number
+        } catch (error) {
+          console.error(`Error finding valid Current_getsqrtPricex96 for swap:`, error);
+        }
+
+
+
+
+let readableAmountOut = 0;
+let ratioAsWei =0;
+let ratioz = 0;
+let token0 = "0x0";
+let token1 = "0x1";
+let token0Decimals = 0;
+let token1Decimals = 0;
+      try {
+        // Call the view function
+        const result = await LPRewards.getPriceRatio();
+
+
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          ratioz = result[0];
+            token0 = result[1];
+            token1 = result[2];
+            token0Decimals = result[3];
+            token1Decimals = result[4];
+
+            console.log("token0 = ", token0," decimals: ", token0Decimals);
+            console.log("token1 = ", token1," decimals: ", token1Decimals);
+            console.log("token0 = ", token0," decimals: ", token0Decimals);
+            console.log("token1 = ", token1," decimals: ", token1Decimals);
+            console.log("token0 = ", token0," decimals: ", token0Decimals);
+            console.log("token1 = ", token1," decimals: ", token1Decimals);
+
+
+          
+          
+          console.log(`Found valid Ratio x10**18: ${ratioz.toString()}`);
+          // Format to display as a readable number
+          readableAmountOut = ethers.formatEther(ratioz);
+          ratioAsWei = ethers.parseEther(readableAmountOut);
+          console.log(`Found valid Ratio x10**18: ${readableAmountOut} mutliplier`);
+        } catch (error) {
+          console.error(`Error finding valid getPriceRatio for swap:`, error);
+        }
+
+
+    let token0a="0x0";
+    let token1a="0x1";
+    let decimals0a=8;
+    let decimals1a=18;
+    let caulcatedpriceRatio =0;
+    let explaination = "?";
+      try {
+        // Call the view function
+        const result = await tokenPooLCreator.debugDecimalAdjustedPrice(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT);
+
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          //ratioz = result[0];
+            token0a = result[0];
+            token1a = result[1];
+            decimals0a = result[2];
+            decimals1a = result[3];
+            caulcatedpriceRatio = result[4];
+            explaination = result[5];
+          console.log("\n `````````````Stats`````````````\n")
+            console.log("token0 = ", token0a," decimals: ", decimals0a);
+            console.log("token1 = ", token1a," decimals: ", decimals1a);
+            console.log("caulcatedpriceRatio: ", caulcatedpriceRatio);
+            console.log("explaination: ", explaination);
+          console.log("\n `````````````Stats`````````````\n")
+
+
+          
+          
+          console.log(`Found valid Ratio x10**18: ${ratioz.toString()}`);
+          // Format to display as a readable number
+          readableAmountOut = ethers.formatEther(ratioz);
+          ratioAsWei = ethers.parseEther(readableAmountOut);
+          console.log(`Found valid Ratio x10**18: ${readableAmountOut} mutliplier`);
+          console.log(`Found valid ratioAsWei: ${ratioAsWei} mutliplier`);
+        } catch (error) {
+          console.error(`Error finding valid debugDecimalAdjustedPrice for swap:`, error);
+        }
+
+
+        let amountToDeposit = ethers.parseEther("200");  // 200 * 10^18 for B0x token
+var amountToDepositOfZer0X = ethers.parseUnits("100", 8); // 0.01 * 10^8 for 0xBTC
+var amountWith8Decimals0xBTC = 0;
+let liquiditySalt = 0; // Declare once outside the if/else
+
+
+    if(token0 == Address_ZEROXBTC_TESTNETCONTRACT) {
+      console.log(`Found valid Ratio: ${ratioz.toString()}`);
+      console.log("TokenA == zer0x Token (0xBTC is token0, B0x is token1)");
+      
+      calculatedPriceRatio = ratioz;
+      amountWith8Decimals0xBTC = amountToDepositOfZer0X;
+
+      // Your calculatedPriceRatio = 200000000000000000000000000000n represents 20 in 29-decimal format
+      // Method 1: Direct conversion to get the economic price (20)
+      const priceIn18Decimals = calculatedPriceRatio / (10n**10n); // Remove extra 11 decimals
+      console.log("Price in 18-decimal format:", priceIn18Decimals.toString()); // Should be 20000000000000000000 (20 * 10^18)
+      
+      // Method 2: Calculate B0x amount needed
+      // Formula: B0x_amount = 0xBTC_amount * price
+      // We need: (amountToDepositOfZer0X in 18-decimal) * (price in 18-decimal) / 10^18
+      
+      const amountZer0XIn18Decimals = amountToDepositOfZer0X * (10n**10n); // Convert 8-decimal to 18-decimal
+      amountToDeposit = (amountZer0XIn18Decimals * priceIn18Decimals) / (10n**18n);
+      
+      // Alternative simpler method:
+      // const economicAmountZer0X = Number(ethers.formatUnits(amountToDepositOfZer0X, 8)); // 0.01
+      // const economicAmountB0x = economicAmountZer0X * 20; // 0.01 * 20 = 0.2
+      // const amountToDeposit = ethers.parseEther(economicAmountB0x.toString());
+
+      console.log(`Estimated Deposit B0x amount: ${ethers.formatEther(amountToDeposit)}`); // Should be 0.2
+      console.log(`Estimated Deposit 0xBTC amount: ${ethers.formatUnits(amountWith8Decimals0xBTC, 8)}`); // Should be 0.01
+
+
+
+} else {
+    amountToDeposit = ethers.parseEther("200");  // 200 * 10^18 for B0x token
+  // Your Solidity should return 50000000000000000 (0.05 in 18-decimal format)
+// But you're getting 5000000, which suggests it's in a different format
+const priceRatio = ratioz; // 5000000n
+
+console.log(`priceRatio: ${priceRatio}`);
+console.log(`Price ratio: ${priceRatio}`);
+
+// Calculate 0xBTC amount: B0x_amount * price_ratio / 10^18
+// Since price = other/B0x = 0.05, then other_amount = B0x_amount * 0.05
+amountWith8Decimals0xBTC = (amountToDeposit * priceRatio) / (10n**18n);
+
+console.log(`Estimated Deposit B0x amount: ${ethers.formatEther(amountToDeposit)}`); // 200.0  
+console.log(`Estimated Deposit 0xBTC amount: ${ethers.formatUnits(amountWith8Decimals0xBTC, 8)}`); // 10.0
+}
+
+
+      var NFTTOkenID = 0;
+
+
+      
+      console.log("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFf");
+      console.log("tokenSwapper Address: ", tokenAddress_Swapper);
+      console.log(`\n\n`);
+      console.log("TokenAddress: ", tokenAddress);
+      console.log("Address_ZEROXBTC_TESTNETCONTRACT: ", Address_ZEROXBTC_TESTNETCONTRACT);
+      console.log("amountToDeposit: ", amountToDeposit);
+      console.log("amountWith8Decimals0xBTC: ", amountWith8Decimals0xBTC);
+      console.log("Current_getsqrtPricex96: ", Current_getsqrtPricex96);
+      console.log("1000 for fee slippage");
+      console.log("HookAddress: ", HookAddress);
+      console.log("tokenAddress_Swapper: ", tokenAddress_Swapper);
+
+     try {
+      //1000 is 1% slippage
+              const tx = await tokenSwapper.createPositionWith2Tokens(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, amountToDeposit,amountWith8Decimals0xBTC,Current_getsqrtPricex96, 1000, HookAddress, tokenAddress_Swapper, {
+  gasPrice: doubledGasPrice
+  });
+        
+      console.log("createPositionWith2Tokens with custom perfect deposit of ETH transaction sent:", tx.hash);
+      console.log("Waiting for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("createPositionWith2Tokens transaction confirmed in block:", receipt.blockNumber);
+      
+const eventSignatureHash = "0x97c3f5c9077358c7266488de6a3ebba41df38417797d90b665239fcb506c840a";// ethers.id("PositionCreated(uint256)"); // ethers.utils.id in ethers v5
+for (const log of receipt.logs) {
+  //console.log("Log: :",log);
+  if (log.topics[0] == eventSignatureHash) {
+    const tokenIdHex = log.topics[1];
+    const tokenIdNumber = Number(BigInt(tokenIdHex));
+  //  console.log("here333");
+    NFTTOkenID = tokenIdNumber;
+    console.log("Token NFT ID = ", tokenIdNumber);+
+    console.log("https://app.uniswap.org/positions/v4/ethereum_sepolia/"+tokenIdNumber);
+  }else if(log.topics[0] == "0xf208f4912782fd25c7f114ca3723a2d5dd6f3bcc3ac8db5af63baa85f711d5ec"){
+      console.log("Found ModifyLiquidity event!");
+      
+      // Decode the event data
+      // The ModifyLiquidity event has format:
+      // ModifyLiquidity(bytes32 indexed id, address indexed sender, int24 tickLower, int24 tickUpper, int256 liquidityDelta, bytes32 salt)
+      
+      // The data field contains: tickLower, tickUpper, liquidityDelta, salt
+      const data = log.data.substring(2); // Remove '0x' prefix
+      
+      // Each parameter is 32 bytes (64 hex characters)
+      // Skip the first 3 parameters to get the salt (4th parameter in data)
+      const saltHex = '0x' + data.substring(64 * 3, 64 * 4);
+      
+      // Convert to a more readable format if needed
+      liquiditySalt = saltHex;
+      console.log("ModifyLiquidity salt:", liquiditySalt);
+      
+      // If you need to just get the right-most part (the number)
+    }
+  }
+  
+
+
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+
+      } catch (error) {
+        console.error(`Error creating createPositionWith2Tokens`, error);
+      }
+
+
+
+console.log("NFT ID: ", NFTTOkenID);
+console.log("liquiditySalt: ", liquiditySalt);
+
+
+
+
+
+
+await sleep(15);
+
+
+
+
+const amountToDepositINCREASELIQ = ethers.parseEther("100");  // Correctly represents 20000 * 10^18
+
+let readableAmountOut2 = 0;
+let ratioAsWei2 =0;
+let tokenZero0Zero = "0x0";
+      try {
+        // Call the view function
+        const result = await LPRewards.getPriceRatio();
+
+
+
+
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          ratioz = result[0];
+            token0 = result[1];
+            token1 = result[2];
+            token0Decimals = result[3];
+            token1Decimals = result[4];
+            tokenZero0Zero = token0;
+            console.log("token0 = ", token0," decimals: ", token0Decimals);
+            console.log("token1 = ", token1," decimals: ", token1Decimals);
+            console.log("token0 = ", token0," decimals: ", token0Decimals);
+            console.log("token1 = ", token1," decimals: ", token1Decimals);
+            console.log("token0 = ", token0," decimals: ", token0Decimals);
+            console.log("token1 = ", token1," decimals: ", token1Decimals);
+
+
+          
+          
+          console.log(`Found valid Ratio x10**18: ${ratioz.toString()}`);
+          // Format to display as a readable number
+          readableAmountOut2 = ethers.formatEther(ratioz);
+          ratioAsWei2 = ethers.parseEther(readableAmountOut2);
+          console.log(`Found valid Ratio x10**18: ${readableAmountOut2} mutliplier`);
+        } catch (error) {
+          console.error(`Error finding valid getPriceRatio for swap:`, error);
+        }
+
+
+
+
+        var amountToDepositIncLiq = ethers.parseEther("150");  // 200 * 10^18 for B0x token
+var amountToDepositOfZer0XIncLiq = ethers.parseUnits("0.00015", 8); // 0.01 * 10^8 for 0xBTC
+var amountWith8Decimals0xBTCIncLiq = 0;
+
+if(tokenZero0Zero == Address_ZEROXBTC_TESTNETCONTRACT) {
+
+
+
+
+
+
+      console.log(`Found valid Ratio: ${ratioz.toString()}`);
+      console.log("TokenA == zer0x Token (0xBTC is token0, B0x is token1)");
+      
+      calculatedPriceRatio = ratioz;
+      amountWith8Decimals0xBTCIncLiq = amountToDepositOfZer0XIncLiq;
+
+      // Your calculatedPriceRatio = 200000000000000000000000000000n represents 20 in 29-decimal format
+      // Method 1: Direct conversion to get the economic price (20)
+      const priceIn18Decimals = calculatedPriceRatio / (10n**10n); // Remove extra 11 decimals
+      console.log("Price in 18-decimal format:", priceIn18Decimals.toString()); // Should be 20000000000000000000 (20 * 10^18)
+      
+      // Method 2: Calculate B0x amount needed
+      // Formula: B0x_amount = 0xBTC_amount * price
+      // We need: (amountToDepositOfZer0X in 18-decimal) * (price in 18-decimal) / 10^18
+      
+      const amountZer0XIn18Decimals = amountToDepositOfZer0XIncLiq * (10n**10n); // Convert 8-decimal to 18-decimal
+      amountToDepositIncLiq = (amountZer0XIn18Decimals * priceIn18Decimals) / (10n**18n);
+      
+      // Alternative simpler method:
+      // const economicAmountZer0X = Number(ethers.formatUnits(amountToDepositOfZer0X, 8)); // 0.01
+      // const economicAmountB0x = economicAmountZer0X * 20; // 0.01 * 20 = 0.2
+      // const amountToDeposit = ethers.parseEther(economicAmountB0x.toString());
+
+      console.log(`Estimated Deposit B0x amount: ${ethers.formatEther(amountToDepositIncLiq)}`); // Should be 0.2
+      console.log(`Estimated Deposit 0xBTC amount: ${ethers.formatUnits(amountWith8Decimals0xBTCIncLiq, 8)}`); // Should be 0.01
+
+
+
+
+} else {
+  // Your Solidity should return 50000000000000000 (0.05 in 18-decimal format)
+// But you're getting 5000000, which suggests it's in a different format
+const priceRatio = ratioz; // 5000000n
+
+console.log(`priceRatio: ${priceRatio}`);
+console.log(`Price ratio: ${priceRatio}`);
+
+// Calculate 0xBTC amount: B0x_amount * price_ratio / 10^18
+// Since price = other/B0x = 0.05, then other_amount = B0x_amount * 0.05
+amountWith8Decimals0xBTCIncLiq = (amountToDepositIncLiq * priceRatio) / (10n**18n);
+
+console.log(`Estimated Deposit B0x amount: ${ethers.formatEther(amountToDepositIncLiq)}`); // 200.0  
+console.log(`Estimated Deposit 0xBTC amount: ${ethers.formatUnits(amountWith8Decimals0xBTCIncLiq, 8)}`); // 10.0
+}
+
+
+
+
+
+
+
+     try {
+              const tx = await tokenSwapper.increaseLiqTwoTokens(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT,  HookAddress, amountToDepositIncLiq, amountWith8Decimals0xBTCIncLiq , NFTTOkenID,0,0, {
+  gasPrice: doubledGasPrice
+  });
+        
+      console.log("Increased Liquidity transaction sent:", tx.hash);
+      console.log("Waiting for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("Increased Liquidity transaction confirmed in block:", receipt.blockNumber);
+      console.log(`Deposited ${ ethers.formatEther(amountToDepositIncLiq.toString())} tokens and another ${ethers.formatUnits(amountWith8Decimals0xBTCIncLiq.toString(), 8)} tokens into tokenID: ${NFTTOkenID}`);
+
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+
+      } catch (error) {
+        console.error(`Error increasing liquidty on token`, error);
+      }
+
+
+
+console.log("NFT ID: ", NFTTOkenID);
+
+
+console.log("/n/n/n*******************************************************");
+
+
+
+const amountToDepositDECREASELIQ = ethers.parseEther("80");  // Correctly represents 20000 * 10^18
+
+const amountToDepositETHDECREASELIQ  = ethers.parseEther("0.04");  // Correctly represents 20000 * 10^18
+
+
+
+
+
+
+
+
+
+
+
+let minAmount0Remove = 0;
+let minAmount1Remove = 0;
+      try {
+        // Call the view function
+        const result = await tokenSwapper.getAmount0andAmount1forLiquidityPercentage(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, 4000, NFTTOkenID, HookAddress);
+
+        if(tokenAddress == token0){
+          minAmount0Remove = result[0];
+          minAmount1Remove = result[1];
+          console.log("token0 = b0x");
+          console.log("token1 = 0xbtc");
+
+
+        }else{
+
+          console.log("token0 = 0xbtc");
+          console.log("token1 = b0x");
+          minAmount0Remove = result[1];
+          minAmount1Remove = result[0];
+        }
+
+
+
+
+        console.log("minRemoveAmount0: ", minAmount0Remove.toString());
+        console.log("minRemoveAmount1: ", minAmount1Remove.toString());
+          
+        } catch (error) {
+          console.error(`Error finding valid getAmount0andAmount1forLiquidityPercentage for remove Liq:`, error);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     try {
+
+              const tx = await tokenSwapper.decreaseLiqTwoTokens(4000, tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, HookAddress, 0, 0, NFTTOkenID, {
+  gasPrice: doubledGasPrice
+  });
+        
+      console.log("DECREASED Liquidity transaction sent:", tx.hash);
+      console.log("Waiting for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("Increased Liquidity transaction confirmed in block:", receipt.blockNumber);
+      console.log("REMOVED 40% of the tokens from tokenID: ", NFTTOkenID);
+
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+
+      } catch (error) {
+        console.error(`Error decrease liquidty on token`, error);
+      }
+
+
+
+console.log("NFT ID: ", NFTTOkenID);
+
+
+
+
+
+
+
+
+
+/*
+
+
+const amountToSwap = ethers.parseEther("20");  // Correctly represents 200 * 10^18
+     try {
+
+    console.log("Done Getting swapper stuff lets actually do something on chain");
+
+      // This approach uses the ABI from the contract factory and connects to the deployed address
+      const tokenContract = CauldronToken.attach(tokenAddress);
+      
+      console.log(`Approving ${tokenAddress_Swapper} to spend ${amountToSwap} tokens...`);
+      const approveTx = await tokenContract.approve(tokenAddress_Swapper, amountToSwap);
+      console.log("Waiting for approval transaction to be mined...");
+      await approveTx.wait();
+      console.log("Token approval successful!");
+
+      } catch (error) {
+        console.error(`Error finding approval swapper stuff`, error);
+      }
+
+*/
+
+const amountToSwap = ethers.parseEther("200");  // Correctly represents 200 * 10^18
+      let amountOut = 0;
+
+      try {
+        var tokenInputAddress = tokenAddress;
+        // Call the view function
+        const result = await tokenSwapper.getOutput.staticCall(Address_ZEROXBTC_TESTNETCONTRACT, tokenAddress, tokenInputAddress, HookAddress, amountToSwap);
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          
+          
+          if (typeof result === 'bigint' || typeof result === 'number') {
+            // If it's already a primitive value
+            amountOut = result;
+          } else if (result._isBigNumber || result instanceof ethers.BigNumber) {
+            // For ethers v5 BigNumber
+            amountOut = result;
+          } else if (typeof result === 'object' && result !== null) {
+            // For objects, try to extract the value
+            // With ethers v6, we might get the value directly
+            if (typeof result.toString === 'function' && result.toString().match(/^[0-9]+$/)) {
+              amountOut = result;
+            } else {
+              // Attempt to extract value based on common patterns
+              amountOut = result[0] || result.amountOut || result._hex || result.value || result;
+            }
+          }
+          
+          console.log(`Found valid amountOut: ${amountOut.toString()}`);
+          
+          // Format to display as a readable number
+          var readableAmountOut2Output = ethers.formatEther(amountOut);
+          var readableAmountIN2Input = ethers.formatUnits(amountToSwap, 8);
+
+
+        if(tokenInputAddress==Address_ZEROXBTC_TESTNETCONTRACT){
+
+
+
+        }else{
+
+           readableAmountOut2Output = ethers.formatUnits(amountOut, 8);
+          readableAmountIN2Input = ethers.formatEther(amountToSwap);
+          
+        }
+
+
+        // Fix the BigInt arithmetic issue
+        if (typeof amountOut === 'bigint') {
+          MinamountOut = amountOut - 10n; // Use 10n for BigInt
+        } else {
+          MinamountOut = amountOut - 10;
+        }
+
+        
+
+          console.log(`Predicted amountOut: ${amountToSwap} tokens for ${MinamountOut} tokens input`);
+          console.log(`Predicted amountOut: ${readableAmountIN2Input} tokens for ${readableAmountOut2Output} tokens input`);
+        } catch (error) {
+          console.error(`Error finding valid getOutput for swap:`, error);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+console.log("\n\n!!!!!!!!!!!!!!!!!!!SWAPTWO TOKENS STUFF INFO BELOW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+console.log("TokenAddress: ", tokenAddress);
+console.log("Address_ZEROXBTC_TESTNETCONTRACT: ", Address_ZEROXBTC_TESTNETCONTRACT);
+console.log("TokenIn: ", tokenAddress);
+console.log("TokenOut: ", Address_ZEROXBTC_TESTNETCONTRACT);
+console.log("AmountIn: ", amountToSwap);
+console.log("MinAmountOut: ", MinamountOut);
+console.log("HookAddress: ", HookAddress);
+console.log("WheretoSendFunds: ", deployer.address);
+     try {
+        // Call the view function
+        const tx = await tokenSwapper.swapTokenTWOTOKENS(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, amountToSwap, MinamountOut, HookAddress, deployer.address, {
+  gasPrice: doubledGasPrice
+     });
+        
+        
+      console.log("swapTokenTWOTOKENS transaction sent:", tx.hash);
+          await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding swapTokenTWOTOKENS stuff`, error);
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  console.log("Preparing to update dynamic LP fee..., 0x0000000000000000000000000000000000000000 , Token Address: ", tokenAddress, "  HOOK ADDRESS: ", HookAddress);
+  // Get the signer's address
+  const [signer] = await hre.ethers.getSigners();
+  console.log(`Using account: ${signer.address}`);
+  
+  // Pool Manager contract address - replace with your actual address
+  const HOOKYAddress = HookAddress;
+  
+  // Get the Pool Manager contract instance
+  // You'll need the ABI for the PoolManager contract
+  const HookYManagerABI = [
+    "function forceUpdateLPFee((address,address,uint24,int24,address),uint24) external"
+  ];
+  
+  const HookManager = new hre.ethers.Contract(
+    HOOKYAddress,
+    HookYManagerABI,
+    signer
+  );
+  
+if(BigInt(Address_ZEROXBTC_TESTNETCONTRACT) > BigInt(tokenAddress)){
+
+  token0000=  tokenAddress;
+  token1111 = Address_ZEROXBTC_TESTNETCONTRACT;
+  }else{
+
+  token0000=  Address_ZEROXBTC_TESTNETCONTRACT;
+  token1111 = tokenAddress;
+
+  }
+  // Define your pool parameters
+  const poolParams = {
+    currency0: token0000, // Lower currency address (sorted numerically)
+    currency1: token1111, // Higher currency address (sorted numerically)
+    tickSpacing: 60, // Replace with your actual tick spacing
+    hooksAddress: HookAddress // This should be the address that's calling this function
+  };
+  
+  // Define the new dynamic LP fee (1 million)
+  const newDynamicLPFee = 10000; // 1%
+
+  console.log("Preparing pool key...");
+  
+  try {
+    // Create the pool key structure as expected by the contract
+    const poolKey = [
+      poolParams.currency0,
+      poolParams.currency1,
+      0x800000, // Dynamic fee flag (highest bit set to 1)
+      poolParams.tickSpacing,
+      poolParams.hooksAddress
+    ];
+    
+    console.log("Updating HookManager forceUpdateLPFee fee...");
+    
+    // Call the updateDynamicLPFee function
+    const tx = await HookManager.forceUpdateLPFee(
+      poolKey,
+      newDynamicLPFee
+    , {
+  gasPrice: doubledGasPrice
+});
+    
+    console.log(`updateDynamicLPFee Transaction sent: ${tx.hash}`);
+    console.log("Waiting for transaction to be mined...");
+    
+    // Wait for the transaction to be mined
+    const receipt = await tx.wait();
+    console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
+    console.log("Dynamic LP fee updated successfully!");
+    
+  } catch (error) {
+    console.error("Error updating dynamic LP fee:", error);
+    
+    // More detailed error information
+    if (error.reason) {
+      console.error("Error reason:", error.reason);
+    }
+    
+    if (error.data) {
+      // Try to decode the error using the contract's interface
+      try {
+        const errorData = error.data;
+        console.error("Contract error data:", errorData);
+      } catch (decodeError) {
+        console.error("Could not decode error data");
+      }
+    }
+  }
+
+
+
+
+
+      console.log("Done Done Done Done DONE DONE We updated Fee to: ",newDynamicLPFee);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      amountOut = 0;
+
+      try {
+        var tokenInputAddress = tokenAddress;
+        // Call the view function
+        const result = await tokenSwapper.getOutput.staticCall(Address_ZEROXBTC_TESTNETCONTRACT, tokenAddress, tokenInputAddress, HookAddress, amountToSwap);
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          
+          
+          if (typeof result === 'bigint' || typeof result === 'number') {
+            // If it's already a primitive value
+            amountOut = result;
+          } else if (result._isBigNumber || result instanceof ethers.BigNumber) {
+            // For ethers v5 BigNumber
+            amountOut = result;
+          } else if (typeof result === 'object' && result !== null) {
+            // For objects, try to extract the value
+            // With ethers v6, we might get the value directly
+            if (typeof result.toString === 'function' && result.toString().match(/^[0-9]+$/)) {
+              amountOut = result;
+            } else {
+              // Attempt to extract value based on common patterns
+              amountOut = result[0] || result.amountOut || result._hex || result.value || result;
+            }
+          }
+          
+          console.log(`Found valid amountOut: ${amountOut.toString()}`);
+          
+          // Format to display as a readable number
+          var readableAmountOut2Output = ethers.formatEther(amountOut);
+          var readableAmountIN2Input = ethers.formatUnits(amountToSwap, 8);
+
+
+        if(tokenInputAddress==Address_ZEROXBTC_TESTNETCONTRACT){
+
+
+
+        }else{
+
+           readableAmountOut2Output = ethers.formatUnits(amountOut, 8);
+          readableAmountIN2Input = ethers.formatEther(amountToSwap);
+          
+        }
+
+
+        // Fix the BigInt arithmetic issue
+        if (typeof amountOut === 'bigint') {
+          MinamountOut = amountOut - 10n; // Use 10n for BigInt
+        } else {
+          MinamountOut = amountOut - 10;
+        }
+
+        
+
+          console.log(`Predicted amountOut: ${amountToSwap} tokens for ${MinamountOut} tokens input`);
+          console.log(`Predicted amountOut: ${readableAmountIN2Input} tokens for ${readableAmountOut2Output} tokens input`);
+        } catch (error) {
+          console.error(`Error finding valid getOutput for swap:`, error);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+console.log("\n\n!!!!!!!!!!!!!!!!!!!SWAPTWO TOKENS STUFF INFO BELOW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+console.log("TokenAddress: ", tokenAddress);
+console.log("Address_ZEROXBTC_TESTNETCONTRACT: ", Address_ZEROXBTC_TESTNETCONTRACT);
+console.log("TokenIn: ", tokenAddress);
+console.log("TokenOut: ", Address_ZEROXBTC_TESTNETCONTRACT);
+console.log("AmountIn: ", amountToSwap);
+console.log("MinAmountOut: ", MinamountOut);
+console.log("HookAddress: ", HookAddress);
+console.log("WheretoSendFunds: ", deployer.address);
+     try {
+        // Call the view function
+        const tx = await tokenSwapper.swapTokenTWOTOKENS(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, amountToSwap, MinamountOut, HookAddress, deployer.address, {
+  gasPrice: doubledGasPrice
+     });
+        
+        
+      console.log("swapTokenTWOTOKENS AFter fee update transaction sent:", tx.hash);
+          await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding swapTokenTWOTOKENS stuff`, error);
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Define the new dynamic LP fee (1 million)
+  const newDynamicLPFee2 = 10000*50
+; // 3456
+
+  console.log("Preparing pool key...");
+  
+  try {
+    // Create the pool key structure as expected by the contract
+    const poolKey = [
+      poolParams.currency0,
+      poolParams.currency1,
+      0x800000, // Dynamic fee flag (highest bit set to 1)
+      poolParams.tickSpacing,
+      poolParams.hooksAddress
+    ];
+    
+    console.log("Updating HookManager forceUpdateLPFee fee...");
+    
+    // Call the updateDynamicLPFee function
+    const tx = await HookManager.forceUpdateLPFee(
+      poolKey,
+      newDynamicLPFee2, {
+  gasPrice: doubledGasPrice
+});
+    
+    console.log(`updateDynamicLPFee SECOND TIME TO ${newDynamicLPFee2} Transaction sent: ${tx.hash}`);
+    console.log("Waiting for transaction to be mined...");
+    
+    // Wait for the transaction to be mined
+    const receipt = await tx.wait();
+    console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
+    console.log("Dynamic LP fee updated successfully!");
+    
+  } catch (error) {
+    console.error("Error updating dynamic LP fee:", error);
+    
+    // More detailed error information
+    if (error.reason) {
+      console.error("Error reason:", error.reason);
+    }
+    
+    if (error.data) {
+      // Try to decode the error using the contract's interface
+      try {
+        const errorData = error.data;
+        console.error("Contract error data:", errorData);
+      } catch (decodeError) {
+        console.error("Could not decode error data");
+      }
+    }
+  }
+
+
+
+
+
+      console.log("Done Done Done Done DONE DONE We updated Fee to: ",newDynamicLPFee2);
+
+
+
+
+
+
+
+
+      amountOut = 0;
+
+      try {
+        var tokenInputAddress = tokenAddress;
+        // Call the view function
+        const result = await tokenSwapper.getOutput.staticCall(Address_ZEROXBTC_TESTNETCONTRACT, tokenAddress, tokenInputAddress, HookAddress, amountToSwap);
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          
+          
+          if (typeof result === 'bigint' || typeof result === 'number') {
+            // If it's already a primitive value
+            amountOut = result;
+          } else if (result._isBigNumber || result instanceof ethers.BigNumber) {
+            // For ethers v5 BigNumber
+            amountOut = result;
+          } else if (typeof result === 'object' && result !== null) {
+            // For objects, try to extract the value
+            // With ethers v6, we might get the value directly
+            if (typeof result.toString === 'function' && result.toString().match(/^[0-9]+$/)) {
+              amountOut = result;
+            } else {
+              // Attempt to extract value based on common patterns
+              amountOut = result[0] || result.amountOut || result._hex || result.value || result;
+            }
+          }
+          
+          console.log(`Found valid amountOut: ${amountOut.toString()}`);
+          
+          // Format to display as a readable number
+          var readableAmountOut2Output = ethers.formatEther(amountOut);
+          var readableAmountIN2Input = ethers.formatUnits(amountToSwap, 8);
+
+
+        if(tokenInputAddress==Address_ZEROXBTC_TESTNETCONTRACT){
+
+
+
+        }else{
+
+           readableAmountOut2Output = ethers.formatUnits(amountOut, 8);
+          readableAmountIN2Input = ethers.formatEther(amountToSwap);
+          
+        }
+
+
+        // Fix the BigInt arithmetic issue
+        if (typeof amountOut === 'bigint') {
+          MinamountOut = amountOut - 10n; // Use 10n for BigInt
+        } else {
+          MinamountOut = amountOut - 10;
+        }
+
+        
+
+          console.log(`Predicted amountOut: ${amountToSwap} tokens for ${MinamountOut} tokens input`);
+          console.log(`Predicted amountOut: ${readableAmountIN2Input} tokens for ${readableAmountOut2Output} tokens input`);
+        } catch (error) {
+          console.error(`Error finding valid getOutput for swap:`, error);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+console.log("\n\n!!!!!!!!!!!!!!!!!!!SWAPTWO TOKENS STUFF INFO BELOW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+console.log("TokenAddress: ", tokenAddress);
+console.log("Address_ZEROXBTC_TESTNETCONTRACT: ", Address_ZEROXBTC_TESTNETCONTRACT);
+console.log("TokenIn: ", tokenAddress);
+console.log("TokenOut: ", Address_ZEROXBTC_TESTNETCONTRACT);
+console.log("AmountIn: ", amountToSwap);
+console.log("MinAmountOut: ", MinamountOut);
+console.log("HookAddress: ", HookAddress);
+console.log("WheretoSendFunds: ", deployer.address);
+     try {
+        // Call the view function
+        const tx = await tokenSwapper.swapTokenTWOTOKENS(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, amountToSwap, MinamountOut, HookAddress, deployer.address, {
+  gasPrice: doubledGasPrice
+     });
+        
+        
+      console.log("swapTokenTWOTOKENS AFter fee update transaction sent:", tx.hash);
+          await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding swapTokenTWOTOKENS stuff`, error);
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+console.log("getting getMaxUniswapIDPossible!");
+var MAXTOKENPOSSIBLE = 0;
+var maxTokenPossible =0;
+      try {
+        // Call the view function
+        const result = await positionFinder.getMaxUniswapIDPossible()
+
+
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          
+          if (typeof result === 'bigint' || typeof result === 'number') {
+            // If it's already a primitive value
+            MAXTOKENPOSSIBLE = result;
+          } else if (result._isBigNumber || result instanceof ethers.BigNumber) {
+            // For ethers v5 BigNumber
+            MAXTOKENPOSSIBLE = result;
+          } else if (typeof result === 'object' && result !== null) {
+            // For objects, try to extract the value
+            // With ethers v6, we might get the value directly
+            if (typeof result.toString === 'function' && result.toString().match(/^[0-9]+$/)) {
+              MAXTOKENPOSSIBLE = result;
+            } else {
+              // Attempt to extract value based on common patterns
+              MAXTOKENPOSSIBLE = result[0] || result.amountOut || result._hex || result.value || result;
+            }
+          }
+          
+          console.log(`Found valid Uniswap v4 MAXTOKEN POSSIBLE: ${MAXTOKENPOSSIBLE.toString()}`);
+
+        // CONVERT TO REGULAR NUMBER FOR LOOP
+        if (typeof MAXTOKENPOSSIBLE === 'bigint') {
+          maxTokenPossible = Number(MAXTOKENPOSSIBLE);
+        } else if (MAXTOKENPOSSIBLE._isBigNumber || MAXTOKENPOSSIBLE instanceof ethers.BigNumber) {
+          // For ethers v5
+          maxTokenPossible = MAXTOKENPOSSIBLE.toNumber();
+        } else if (typeof MAXTOKENPOSSIBLE.toString === 'function') {
+          // For ethers v6 or other BigInt-like objects
+          maxTokenPossible = Number(MAXTOKENPOSSIBLE.toString());
+        } else {
+          maxTokenPossible = Number(MAXTOKENPOSSIBLE);
+        }
+
+        console.log(`Converted to number for loop: ${maxTokenPossible}`);
+        } catch (error) {
+          console.error(`Error finding valid getMaxUniswapIDPossible for swap:`, error);
+        }
+
+
+
+
+
+
+
+
+
+
+  let feesOwedToken1 = [];
+  let feesOwedToken2 = [];
+
+let fees0 = 0;
+let fees1 = 0;
+
+try {
+  const maxLoopLookups = 1000;
+  var startSearchAt = 0; // Start searching from token ID 0
+  const totalRange = maxTokenPossible - startSearchAt;
+  const NumberOfLoops = Math.ceil(totalRange / maxLoopLookups);
+  
+  // Initialize as empty arrays (not undefined)
+  let ownedTokenIds = [];
+  let OWNEDtOKEN1 = [];
+  let OWNEDtOKEN2 = [];
+  let liquidity = [];
+  let poolKeyi = [];
+  let poolInfoi = [];
+  
+  for (let x = 0; x < NumberOfLoops; x++) {
+    const startId = startSearchAt + (maxLoopLookups * x);
+    const endId = Math.min(startId + maxLoopLookups - 1, maxTokenPossible);
+    
+    console.log("Looking at NFT ids in this search IDS:", startId, "to", endId);
+    
+    const result = await positionFinder.findUserTokenIds(
+      tokenAddress_Swapper,
+      NFTTOkenID, 
+      NFTTOkenID, 
+      tokenAddress, 
+      Address_ZEROXBTC_TESTNETCONTRACT,
+      HookAddress
+    );
+    
+    // Concatenate arrays properly using spread operator or concat
+    ownedTokenIds = ownedTokenIds.concat(result[0]);
+    OWNEDtOKEN1 = OWNEDtOKEN1.concat(result[1]);
+    OWNEDtOKEN2 = OWNEDtOKEN2.concat(result[2]);
+    liquidity = liquidity.concat(result[3]);
+    feesOwedToken1 = feesOwedToken1.concat(result[4]);
+    feesOwedToken2 = feesOwedToken2.concat(result[5]);
+    console.log("fees in loop = ",result[4]);
+    console.log("fees in loop = ",result[5]);
+    poolKeyi = poolKeyi.concat(result[6]);
+    poolInfoi = poolInfoi.concat(result[7]);
+
+  }
+
+        } catch (error) {
+          console.error(`Error finding valid positionFinder.findUserTokenIds:`, error);
+        }
+
+
+
+fees0 = feesOwedToken2[0];
+fees1 = feesOwedToken1[0];
+console.log("Fees0: ",fees0);
+console.log("fees1: ",fees1);
+
+
+await sleep(5);
+
+
+
+
+
+
+console.log(`YOU WILL USE THIS MANY FEES FOR NEXT INCREASE LIQUIDITY!`);
+console.log(`Fees0 = ${ethers.formatEther(fees0)}    &    Fees1 = ${ethers.formatEther(fees1)} `);
+console.log(`Fees0 = ${ethers.formatEther(fees0)}    &    Fees1 = ${ethers.formatEther(fees1)} `);
+console.log(`fees space, now increase liq perfectly`)
+
+const amountToDepositINCREASELIQ2 = ethers.parseEther("150");  // Correctly represents 20000 * 10^18
+
+let readableAmountOut22 = 0;
+let ratioAsWei22 =0;
+
+
+
+      try {
+        // Call the view function
+        const result = await LPRewards.getPriceRatio();
+
+
+
+
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          ratioz = result[0];
+            token0 = result[1];
+            token1 = result[2];
+            token0Decimals = result[3];
+            token1Decimals = result[4];
+            tokenZero0Zero = token0;
+            console.log("token0 = ", token0," decimals: ", token0Decimals);
+            console.log("token1 = ", token1," decimals: ", token1Decimals);
+
+
+          
+          
+          console.log(`Found valid Ratio x10**18: ${ratioz.toString()}`);
+          // Format to display as a readable number
+          readableAmountOut2 = ethers.formatEther(ratioz);
+          ratioAsWei2 = ethers.parseEther(readableAmountOut2);
+          console.log(`Found valid Ratio x10**18: ${readableAmountOut2} mutliplier`);
+        } catch (error) {
+          console.error(`Error finding valid getPriceRatio for swap:`, error);
+        }
+
+
+
+
+        var amountToDepositIncLiq = ethers.parseEther("150");  // 200 * 10^18 for B0x token
+var amountToDepositOfZer0XIncLiq = ethers.parseUnits("0.15", 8); // 0.01 * 10^8 for 0xBTC
+var amountWith8Decimals0xBTCIncLiq = 0;
+
+if(tokenZero0Zero == Address_ZEROXBTC_TESTNETCONTRACT) {
+
+
+
+
+      console.log(`Found valid Ratio: ${ratioz.toString()}`);
+      console.log("TokenA == zer0x Token (0xBTC is token0, B0x is token1)");
+      
+      calculatedPriceRatio = ratioz;
+      amountWith8Decimals0xBTCIncLiq = amountToDepositOfZer0XIncLiq;
+
+      // Your calculatedPriceRatio = 200000000000000000000000000000n represents 20 in 29-decimal format
+      // Method 1: Direct conversion to get the economic price (20)
+      const priceIn18Decimals = calculatedPriceRatio /(10n**10n);// Remove extra 11 decimals
+      console.log("Price in 18-decimal format:", priceIn18Decimals.toString()); // Should be 20000000000000000000 (20 * 10^18)
+      
+      // Method 2: Calculate B0x amount needed
+      // Formula: B0x_amount = 0xBTC_amount * price
+      // We need: (amountToDepositOfZer0X in 18-decimal) * (price in 18-decimal) / 10^18
+      
+      const amountZer0XIn18Decimals = amountToDepositOfZer0XIncLiq * (10n**10n); // Convert 8-decimal to 18-decimal
+      amountToDepositIncLiq = (amountZer0XIn18Decimals * priceIn18Decimals) / (10n**18n);
+      
+      // Alternative simpler method:
+      // const economicAmountZer0X = Number(ethers.formatUnits(amountToDepositOfZer0X, 8)); // 0.01
+      // const economicAmountB0x = economicAmountZer0X * 20; // 0.01 * 20 = 0.2
+      // const amountToDeposit = ethers.parseEther(economicAmountB0x.toString());
+
+console.log(`Estimated Deposit B0x amount: ${ethers.formatEther(amountToDepositIncLiq)}`); // 200.0  
+console.log(`Estimated Deposit 0xBTC amount: ${ethers.formatUnits(amountWith8Decimals0xBTCIncLiq, 8)}`); // 10.0
+console.log(`fees0: ${fees0}`); // 200.0  
+console.log(`fees1: ${fees1}`); // 200.0  
+console.log(`amountWith8Decimals0xBTCIncLiq: ${amountWith8Decimals0xBTCIncLiq}`); // 200.0  
+console.log(`amountToDepositIncLiq: ${amountToDepositIncLiq}`); // 200.0  
+
+var amountWith8Decimals0xBTCIncLiqfees= amountWith8Decimals0xBTCIncLiq -fees1;
+var amountToDepositIncLiqfees = amountToDepositIncLiq - fees0;
+
+console.log(`Estimated After Fees Deposit B0x amount: ${ethers.formatEther(amountToDepositIncLiqfees)}`); // 200.0  
+console.log(`Estimated After Fees Deposit 0xBTC amount: ${ethers.formatUnits(amountWith8Decimals0xBTCIncLiqfees, 8)}`); // 10.0
+
+
+
+/*
+var tempfee = fees1;
+fees1=fees0;
+fees0=tempfee;
+*/
+
+
+} else {
+  // Your Solidity should return 50000000000000000 (0.05 in 18-decimal format)
+// But you're getting 5000000, which suggests it's in a different format
+const priceRatio = ratioz; // 5000000n
+
+console.log(`priceRatio: ${priceRatio}`);
+console.log(`Price ratio: ${priceRatio}`);
+
+// Calculate 0xBTC amount: B0x_amount * price_ratio / 10^18
+// Since price = other/B0x = 0.05, then other_amount = B0x_amount * 0.05
+amountWith8Decimals0xBTCIncLiq = (amountToDepositIncLiq * priceRatio) / (10n**18n);
+
+console.log(`Estimated Deposit B0x amount: ${ethers.formatEther(amountToDepositIncLiq)}`); // 200.0  
+console.log(`Estimated Deposit 0xBTC amount: ${ethers.formatUnits(amountWith8Decimals0xBTCIncLiq, 8)}`); // 10.0
+console.log(`fees0: ${fees0}`); // 200.0  
+console.log(`fees1: ${fees1}`); // 200.0  
+console.log(`amountWith8Decimals0xBTCIncLiq: ${amountWith8Decimals0xBTCIncLiq}`); // 200.0  
+console.log(`amountToDepositIncLiq: ${amountToDepositIncLiq}`); // 200.0  
+var amountWith8Decimals0xBTCIncLiqfees= amountWith8Decimals0xBTCIncLiq -fees1;
+var amountToDepositIncLiqfees = amountToDepositIncLiq - fees0;
+
+console.log(`Estimated After Fees Deposit B0x amount: ${ethers.formatEther(amountToDepositIncLiqfees)}`); // 200.0  
+console.log(`Estimated After Fees Deposit 0xBTC amount: ${ethers.formatUnits(amountWith8Decimals0xBTCIncLiqfees, 8)}`); // 10.0
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+console.log("DEBUG THIS!((((((((((((((((((((((((((((((((((((((((((((((((((((((");
+console.log(`tokenAddress ${tokenAddress}`);
+console.log(`Address_ZEROXBTC_TESTNETCONTRACT ${Address_ZEROXBTC_TESTNETCONTRACT}`);
+console.log(`HookAddress ${HookAddress}`);
+console.log(`amountToDepositIncLiq ${amountToDepositIncLiq}`);
+console.log(`amountWith8Decimals0xBTCIncLiq ${amountWith8Decimals0xBTCIncLiq}`);
+console.log(`NFTTOkenID ${NFTTOkenID}`);
+console.log(`fees0 ${fees0}`);
+console.log(`fees1 ${fees1}`);
+
+   try {
+
+
+var tx = 0;
+              tx = await tokenSwapper.increaseLiqTwoTokens(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT,  HookAddress, amountToDepositIncLiq, amountWith8Decimals0xBTCIncLiq , NFTTOkenID,fees0,fees1, {
+  gasPrice: doubledGasPrice
+  });
+        
+
+
+
+        
+      console.log("Increased Liquidity with fees transaction sent:", tx.hash);
+      console.log("Waiting for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("Increased Liquidity with fees transaction confirmed in block:", receipt.blockNumber);
+  await sleep(1000 * 10);
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+
+      } catch (error) {
+        console.error(`Error increasing liquidty with feeson token`, error);
+      }
+
+
+
+
+
+
+
+
+
+
+console.log("sleep 1 seconds please");
+await sleep(1* 1000);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      console.log(" SO Done Done Done Done DONE DONE we Swapped to ETH AGAIN");
+      console.log("1st Deposit LETS GET FEES depositNFTintoStakingContract calling")
+
+
+
+     try {
+        // Call the view function
+
+        const tx = await tokenSwapper.depositNFTintoStakingContract(NFTTOkenID, {
+  gasPrice: doubledGasPrice
+});
+        //const tx = await tokenSwapper.getUnsiwapv4Fees( NFTTOkenID, tokenAddress, deployer.address);
+        
+        
+      console.log("depositNFTintoStakingContract transaction sent:", tx.hash);
+         
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding getUnsiwapv4Fees`, error);
+      }
+
+      console.log("depositNFTintoStakingContract depositNFTintoStakingContract depositNFTintoStakingContract5566 my good sir");
+
+
+
+
+
+
+console.log("roundabout with the NFTs to generate fees to test");
+      console.log(" SO Done Done Done Done DONE DONE we Swapped to ETH AGAIN");
+      console.log("1st withdraw LETS GET FEES WITHDRAW_NFTintoStakingContract calling")
+
+
+
+     try {
+        // Call the view function
+
+        const tx = await tokenSwapper.WITHDRAW_NFTintoStakingContract(NFTTOkenID, {
+  gasPrice: doubledGasPrice
+});
+        //const tx = await tokenSwapper.getUnsiwapv4Fees( NFTTOkenID, tokenAddress, deployer.address);
+        
+        
+      console.log("WITHDRAW_NFTintoStakingContractcheck!! transaction sent:", tx.hash);
+         
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding WITHDRAW_NFTintoStakingContractcheck`, error);
+      }
+
+
+      
+      console.log("WITHDRAW_NFTintoStakingContractcheck DONE please my good sir");
+
+
+  console.log("WITHDRAW_NFTintoStakingContractcheck DONE please my good sir");
+
+
+
+
+
+
+      console.log(" SO Done Done Done Done DONE DONE we Swapped to ETH AGAIN");
+      console.log(" second deposit LETS GET FEES depositNFTintoStakingContract calling123123")
+
+
+
+     try {
+        // Call the view function
+
+        const tx = await tokenSwapper.depositNFTintoStakingContract(NFTTOkenID, {
+  gasPrice: doubledGasPrice,
+  gasLimit: 1500000 // Set a manual gas limit to bypass estimation
+
+});
+        //const tx = await tokenSwapper.getUnsiwapv4Fees( NFTTOkenID, tokenAddress, deployer.address);
+        
+        
+      console.log("second depositNFTintoStakingContract transaction sent:", tx.hash);
+         
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding second deposit depositNFTintoStakingContract`, error);
+      }
+
+      console.log("success second depositdepositNFTintoStakingContract depositNFTintoStakingContract depositNFTintoStakingContract my good sir");
+
+
+
+      try {
+        // Call the view function
+        const result = await LPRewards.getStakingTokenAmounts();
+
+              amount0StakingContract = result[0];
+              amount1StakingContract = result[1];
+          
+          console.log(`Found valid amount0 of stakingContract: ${amount0StakingContract.toString()}`);
+          console.log(`Found valid amount1 of stakingContract: ${amount1StakingContract.toString()}`);
+          // Format to display as a readable number
+        } catch (error) {
+          console.error(`Error finding valid getStakingTokenAmounts for swap:`, error);
+        }
+
+
+await sleep(1000* 10);
+
+
+
+var amount0LP = 0;
+var amount1LP = 0;
+let amount0LPfees = 0;
+let amount1LPfees = 0;
+
+let total0 = 0;
+let total1 = 0;
+      try {
+        // Call the view function
+        // Call the view function
+          const result = await LPRewards.getMaxRedeemableTokens(NFTTOkenID, tokenAddress_Swapper);
+
+                                            // After destructuring
+              amount0LPfees = result[0];
+              amount1LPfees = result[1];
+              amount0LP = result[2];
+              amount1LP = result[3];
+
+
+                        // Now .add() will work
+            // Add BigInts with the + operator
+            total0 = amount0LP + amount0LPfees;
+            total1 = amount1LP + amount1LPfees;
+          console.log("LP_Rewards getTokenAmountForPercentageLiquidity Result amount0LP:", amount0LP);
+          console.log("LP_Rewards getTokenAmountForPercentageLiquidity Result amount1LP:", amount1LP);
+        } catch (error) {
+          console.error(`Error getTokenAmountForPercentageLiquidity:`, error);
+        }
+
+
+    console.log("https://app.uniswap.org/positions/v4/ethereum_sepolia/"+NFTTOkenID);
+    console.log(`Should have amount0: ${ethers.formatEther(amount0LP)}  amount1: ${ethers.formatEther(amount1LP)}`);
+    console.log(`Should have amount0LPfees: ${ethers.formatEther(amount0LPfees)}  amount1LPfees: ${ethers.formatEther(amount1LPfees)}`);
+
+        console.log("Totaled together ==================");
+      console.log(`After next command we will net removed from position total0: ${ethers.formatEther(total0)}  total1: ${ethers.formatEther(total1)}`);
+
+
+// Constants - ethers v6 uses native BigInt
+var liquidityToRemove = 10000000000000n;
+var denominator = 10000000000000n;
+var numeratorMultiplier = 3n;
+var baseDivider = 4n;
+
+
+console.log("amount0LP : ",amount0LP);
+console.log("amount1LP : ",amount1LP);
+console.log("liquidityToRemove : ",liquidityToRemove);
+console.log("denominator : ",denominator);
+console.log("numeratorMultiplier : ",numeratorMultiplier);
+console.log("baseDivider : ",baseDivider);
+// Math operations using native BigInt
+// Math operations using native BigInt
+var amount0Min = (amount0LP * numeratorMultiplier * liquidityToRemove) / (baseDivider * denominator);
+
+var amount1Min = (amount1LP * numeratorMultiplier * liquidityToRemove) / (baseDivider * denominator);
+
+
+     try {
+        // Call the view function
+        //percentageToRemoveOutOf10000000000000 so 100 = 10000/10000000000000 = 0.000000001 * 100 = 0.0000001%
+        const tx = await tokenSwapper.DecreaseLiqONLPRewards(NFTTOkenID, 10000000000000, amount0Min, amount1Min, {
+  gasPrice: doubledGasPrice
+});
+        
+        
+      console.log("CHECK THIS TO SEE IF WE CLAIM FEES, should be large amount of fees going to our staking contract tx hash sent:", tx.hash);
+         
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding DecreaseLiqONLPRewards`, error);
+      }
+
+      console.log("DecreaseLiqONLPRewards ");
+
+    console.log(`Total collected amount0: ${ethers.formatEther(total0)}  amount1: ${ethers.formatEther(total1)}`);
+    console.log(`We have collected amount0: ${ethers.formatEther(amount0LP)}  amount1: ${ethers.formatEther(amount1LP)}`);
+
+
+
+console.log("CHECK RESULTS SLEEP 200 seconds");
+await sleep(1 * 1000);
+
+
+
+
+// Position Manager contract setup
+const positionManagerABI = [
+  {
+    "inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}],
+    "name": "getPoolAndPositionInfo",
+    "outputs": [
+      {
+        "internalType": "struct PoolKey",
+        "name": "poolKey",
+        "type": "tuple",
+        "components": [
+          {"internalType": "address", "name": "currency0", "type": "address"}, // Changed from Currency
+          {"internalType": "address", "name": "currency1", "type": "address"}, // Changed from Currency  
+          {"internalType": "uint24", "name": "fee", "type": "uint24"},
+          {"internalType": "int24", "name": "tickSpacing", "type": "int24"},
+          {"internalType": "address", "name": "hooks", "type": "address"} // Changed from IHooks
+        ]
+      },
+      {"internalType": "uint256", "name": "info", "type": "uint256"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address", "name": "owner", "type": "address"}],
+    "name": "balanceOf",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}],
+    "name": "ownerOf",
+    "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
+  
+  const positionManager = new hre.ethers.Contract(
+    POSITION_MANAGER_ADDRESS,
+    positionManagerABI,
+    signer
+  );
+
+
+console.log("getting getMaxUniswapIDPossible!");
+var MAXTOKENPOSSIBLE = 0;
+var maxTokenPossible =0;
+      try {
+        // Call the view function
+        const result = await positionFinder.getMaxUniswapIDPossible()
+
+
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          
+          if (typeof result === 'bigint' || typeof result === 'number') {
+            // If it's already a primitive value
+            MAXTOKENPOSSIBLE = result;
+          } else if (result._isBigNumber || result instanceof ethers.BigNumber) {
+            // For ethers v5 BigNumber
+            MAXTOKENPOSSIBLE = result;
+          } else if (typeof result === 'object' && result !== null) {
+            // For objects, try to extract the value
+            // With ethers v6, we might get the value directly
+            if (typeof result.toString === 'function' && result.toString().match(/^[0-9]+$/)) {
+              MAXTOKENPOSSIBLE = result;
+            } else {
+              // Attempt to extract value based on common patterns
+              MAXTOKENPOSSIBLE = result[0] || result.amountOut || result._hex || result.value || result;
+            }
+          }
+          
+          console.log(`Found valid Uniswap v4 MAXTOKEN POSSIBLE: ${MAXTOKENPOSSIBLE.toString()}`);
+
+        // CONVERT TO REGULAR NUMBER FOR LOOP
+        if (typeof MAXTOKENPOSSIBLE === 'bigint') {
+          maxTokenPossible = Number(MAXTOKENPOSSIBLE);
+        } else if (MAXTOKENPOSSIBLE._isBigNumber || MAXTOKENPOSSIBLE instanceof ethers.BigNumber) {
+          // For ethers v5
+          maxTokenPossible = MAXTOKENPOSSIBLE.toNumber();
+        } else if (typeof MAXTOKENPOSSIBLE.toString === 'function') {
+          // For ethers v6 or other BigInt-like objects
+          maxTokenPossible = Number(MAXTOKENPOSSIBLE.toString());
+        } else {
+          maxTokenPossible = Number(MAXTOKENPOSSIBLE);
+        }
+
+        console.log(`Converted to number for loop: ${maxTokenPossible}`);
+        } catch (error) {
+          console.error(`Error finding valid getMaxUniswapIDPossible for swap:`, error);
+        }
+
+
+
+
+
+  console.log("DOING findAllUsersTokenIDSinStaking CHECKING findAllUsersTokenIDSinStaking function first!");
+
+try {
+  const maxLoopLookups = 1000;
+  var startSearchAt = 0; // Start searching from token ID 0
+  const totalRange = maxTokenPossible - startSearchAt;
+  const NumberOfLoops = Math.ceil(totalRange / maxLoopLookups);
+  
+  // Initialize as empty arrays (not undefined)
+  let ownedTokenIds = [];
+  let OWNEDtOKEN1 = [];
+  let OWNEDtOKEN2 = [];
+  let liquidity = [];
+  let feesOwedToken1 = [];
+  let feesOwedToken2 = [];
+  let poolKeyi = [];
+  let poolInfoi = [];
+  
+  for (let x = 0; x < NumberOfLoops; x++) {
+    const startId = startSearchAt + (maxLoopLookups * x);
+    const endId = Math.min(startId + maxLoopLookups - 1, maxTokenPossible);
+    
+    console.log("Looking at NFT ids in this search IDS:", startId, "to", endId);
+    
+    const result = await positionFinder.findAllUsersTokenIDSinStaking(
+      startId, 
+      endId, 
+      tokenAddress, 
+      Address_ZEROXBTC_TESTNETCONTRACT,
+      HookAddress,
+      0
+    );
+    
+    // Concatenate arrays properly using spread operator or concat
+    ownedTokenIds = ownedTokenIds.concat(result[0]);
+    OWNEDtOKEN1 = OWNEDtOKEN1.concat(result[1]);
+    OWNEDtOKEN2 = OWNEDtOKEN2.concat(result[2]);
+    liquidity = liquidity.concat(result[3]);
+    feesOwedToken1 = feesOwedToken1.concat(result[4]);
+    feesOwedToken2 = feesOwedToken2.concat(result[5]);
+    poolKeyi = poolKeyi.concat(result[6]);
+    poolInfoi = poolInfoi.concat(result[7]);
+
+  }
+
+
+
+
+  console.log("Number of tokens owned By rewards Contract:", ownedTokenIds.length);
+  console.log("Owned Token IDs by rewards Contract:", ownedTokenIds.map(id => id.toString()));
+  
+  // Now loop through each token ID to get position details
+  for (let i = 0; i < ownedTokenIds.length; i++) {
+    const tokenId = ownedTokenIds[i];
+    
+    try {
+        // Get pool and position info using V4 method with corrected types
+       // const [poolKey, info2] = await positionManager.getPoolAndPositionInfo(tokenId);
+        poolKey = poolKeyi[i];
+        info2 = poolInfoi[i];
+        console.log(`Token ID ${tokenId.toString()}:`);
+        console.log(" Pool Key:");
+        console.log("   Currency0:", poolKey.currency0);     // Now properly typed as address
+        console.log("   Currency1:", poolKey.currency1);     // Now properly typed as address
+        console.log("   Fee:", poolKey.fee.toString());
+        console.log("   Tick Spacing:", poolKey.tickSpacing.toString());
+        console.log("   Hooks:", poolKey.hooks);             // Now properly typed as address
+        console.log(" Position Info (packed):", info2.toString());
+        
+
+  
+  const decodedInfo = {
+    tickLower: TOtickLower(info2.toString()),
+    tickUpper: TOtickUpper(info2.toString())
+  };
+
+
+
+
+        console.log(" Decoded Position Info:");
+        console.log("   Tick Lower:", decodedInfo.tickLower);
+        console.log("   Tick Upper:", decodedInfo.tickUpper);
+        console.log("   tOKEN 1 AMOUNT:",OWNEDtOKEN1[i].toString());
+        console.log("   tOKEN 2 AMOUNT:",OWNEDtOKEN2[i].toString());
+        console.log("   Liquidity:", liquidity[i]);
+        console.log("   FEES OWED Token 1 AMOUNT:",feesOwedToken1[i].toString());
+        console.log("   FEES OWED Token 2 AMOUNT:",feesOwedToken2[i].toString());
+      
+    } catch (positionError) {
+      console.error(`Error getting position details for token ${tokenId}:`, positionError);
+    }
+
+  }
+  
+} catch (error) {
+  console.error(`Error findUserTokenIds:`, error);
+}
+
+
+
+
+
+let sqrtPricex96 = 0;
+      try {
+        // Call the view function
+        const result = await LPRewards.getExpectedSqrtPricex96();
+
+
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          
+          // Handle the
+          
+          if (typeof result === 'bigint' || typeof result === 'number') {
+            // If it's already a primitive value
+            sqrtPricex96 = result;
+          } else if (result._isBigNumber || result instanceof ethers.BigNumber) {
+            // For ethers v5 BigNumber
+            sqrtPricex96 = result;
+          } else if (typeof result === 'object' && result !== null) {
+            // For objects, try to extract the value
+            // With ethers v6, we might get the value directly
+            if (typeof result.toString === 'function' && result.toString().match(/^[0-9]+$/)) {
+              sqrtPricex96 = result;
+            } else {
+              // Attempt to extract value based on common patterns
+              sqrtPricex96 = result[0] || result.amountOut || result._hex || result.value || result;
+            }
+          }
+          
+          console.log(`Found valid sqrtPricex96: ${sqrtPricex96.toString()}`);
+          
+        } catch (error) {
+          console.error(`Error finding valid getOutput for swap:`, error);
+        }
+
+
+
+
+
+          console.log(`Found valid sqrtPricex96: ${sqrtPricex96.toString()}`);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+let readableAmountOut22z = 0;
+let ratioAsWei22z =0;
+      try {
+        // Call the view function
+        const result = await LPRewards.getPriceRatio();
+
+
+
+
+
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          ratioz = result[0];
+            token0 = result[1];
+            token1 = result[2];
+            token0Decimals = result[3];
+            token1Decimals = result[4];
+
+            console.log("token0 = ", token0," decimals: ", token0Decimals);
+            console.log("token1 = ", token1," decimals: ", token1Decimals);
+            console.log("token0 = ", token0," decimals: ", token0Decimals);
+            console.log("token1 = ", token1," decimals: ", token1Decimals);
+            console.log("token0 = ", token0," decimals: ", token0Decimals);
+            console.log("token1 = ", token1," decimals: ", token1Decimals);
+
+
+          
+          
+          console.log(`Found valid Ratio x10**18: ${ratioz.toString()}`);
+          // Format to display as a readable number
+          readableAmountOut22z = ethers.formatEther(ratioz);
+          ratioAsWei22z = ethers.parseEther(readableAmountOut22z);
+          console.log(`Found valid Ratio x10**18: ${readableAmountOut2} mutliplier`);
+        } catch (error) {
+          console.error(`Error finding valid getOutput for swap:`, error);
+        }
+
+
+
+const amountToDepositINCREASELIQ2222 = ethers.parseEther("100");  // Correctly represents 20000 * 10^18
+
+
+        var amountToDepositIncLiq = amountToDepositINCREASELIQ2222;  // 200 * 10^18 for B0x token
+var amountToDepositOfZer0XIncLiq = ethers.parseUnits("0.00077", 8); // 0.01 * 10^8 for 0xBTC
+var amountWith8Decimals0xBTCIncLiq = 0;
+
+let token0Amountz = 0;
+let token1Amountz = 0;
+if(tokenZero0Zero == Address_ZEROXBTC_TESTNETCONTRACT) {
+    console.log(`Found valid Ratio: ${ratioz.toString()}`);
+    console.log("TokenA == zer0x Token (0xBTC is token0, B0x is token1)");
+    
+      calculatedPriceRatio = ratioz;
+      amountWith8Decimals0xBTCIncLiq = amountToDepositOfZer0XIncLiq;
+
+      // Your calculatedPriceRatio = 200000000000000000000000000000n represents 20 in 29-decimal format
+      // Method 1: Direct conversion to get the economic price (20)
+      const priceIn18Decimals = calculatedPriceRatio /(10n**10n);// Remove extra 11 decimals
+      console.log("Price in 18-decimal format:", priceIn18Decimals.toString()); // Should be 20000000000000000000 (20 * 10^18)
+      
+      // Method 2: Calculate B0x amount needed
+      // Formula: B0x_amount = 0xBTC_amount * price
+      // We need: (amountToDepositOfZer0X in 18-decimal) * (price in 18-decimal) / 10^18
+      
+      const amountZer0XIn18Decimals = amountToDepositOfZer0XIncLiq * (10n**10n); // Convert 8-decimal to 18-decimal
+      amountToDepositIncLiq = (amountZer0XIn18Decimals * priceIn18Decimals) / (10n**18n);
+      
+      // Alternative simpler method:
+      // const economicAmountZer0X = Number(ethers.formatUnits(amountToDepositOfZer0X, 8)); // 0.01
+      // const economicAmountB0x = economicAmountZer0X * 20; // 0.01 * 20 = 0.2
+      // const amountToDeposit = ethers.parseEther(economicAmountB0x.toString());
+
+      console.log(`Estimated Deposit B0x amount: ${ethers.formatEther(amountToDepositIncLiq)}`); // Should be 0.2
+      console.log(`Estimated Deposit 0xBTC amount: ${ethers.formatUnits(amountWith8Decimals0xBTCIncLiq, 8)}`); // Should be 0.01
+
+
+token0Amountz = amountToDepositIncLiq;
+token1Amountz = amountWith8Decimals0xBTCIncLiq;
+
+} else {
+  // Your Solidity should return 50000000000000000 (0.05 in 18-decimal format)
+// But you're getting 5000000, which suggests it's in a different format
+const priceRatio = ratioz; // 5000000n
+
+console.log(`priceRatio: ${priceRatio}`);
+console.log(`Price ratio: ${priceRatio}`);
+
+// Calculate 0xBTC amount: B0x_amount * price_ratio / 10^18
+// Since price = other/B0x = 0.05, then other_amount = B0x_amount * 0.05
+amountWith8Decimals0xBTCIncLiq = (amountToDepositIncLiq * priceRatio) / (10n**18n);
+
+console.log(`Estimated Deposit B0x amount: ${ethers.formatEther(amountToDepositIncLiq)}`); // 200.0  
+console.log(`Estimated Deposit 0xBTC amount: ${ethers.formatUnits(amountWith8Decimals0xBTCIncLiq, 8)}`); // 10.0
+
+token0Amountz = amountToDepositIncLiq;
+token1Amountz = amountWith8Decimals0xBTCIncLiq;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      console.log("VVVVVVVVVVVVVVV ! IncreaseLiqONLPRewards started ");
+      console.log("IncreaseLiqONLPRewards started ");
+
+      console.log("tokenAddress: ",tokenAddress);
+      console.log("Address_ZEROXBTC_TESTNETCONTRACT: ",Address_ZEROXBTC_TESTNETCONTRACT);
+      console.log("NFTTOkenID: ",NFTTOkenID);
+      console.log("token0Amountz: ",token0Amountz);
+      console.log("token1Amountz: ",token1Amountz);
+      console.log("sqrtPricex96: ",sqrtPricex96);
+      console.log("Slippage: 1000  ");
+
+     try {
+        // Call the view function
+        //2500 = 1/4th so 25% of liq to remove
+        //100 basis poitns for our descrepancy max
+        const tx = await tokenSwapper.IncreaseLiqONLPRewards(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, NFTTOkenID, token0Amountz, token1Amountz ,sqrtPricex96, 1000, {
+            gasPrice: doubledGasPrice
+        });
+        
+        
+      console.log("IncreaseLiqONLPRewards transaction sent:", tx.hash);
+         
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding IncreaseLiqONLPRewards`, error);
+      }
+
+      console.log("IncreaseLiqONLPRewards DONE sleep try transaction manually");
+
+
+//before increase we want to exit to see if it allows
+
+
+await sleep(1000*50);
+
+
+      console.log("Dcreased Liq with NFT in staking contract!!!!!!!!!!!!@!@!");
+
+/*
+
+
+     try {
+        // Call the view function
+        const tx = await tokenSwapper.swapTokenToETH(tokenAddress, amountToSwap, 0, HookAddress, deployer.address, {
+  gasPrice: doubledGasPrice
+});
+        
+        
+      console.log("swapTokenToETH transaction sent:", tx.hash);
+          await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding swapper stuff`, error);
+      }
+*/
+
+
+
+
+      amountOut = 0;
+
+      try {
+        var tokenInputAddress = tokenAddress;
+        // Call the view function
+        const result = await tokenSwapper.getOutput.staticCall(Address_ZEROXBTC_TESTNETCONTRACT, tokenAddress, tokenInputAddress, HookAddress, amountToSwap);
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          
+          
+          if (typeof result === 'bigint' || typeof result === 'number') {
+            // If it's already a primitive value
+            amountOut = result;
+          } else if (result._isBigNumber || result instanceof ethers.BigNumber) {
+            // For ethers v5 BigNumber
+            amountOut = result;
+          } else if (typeof result === 'object' && result !== null) {
+            // For objects, try to extract the value
+            // With ethers v6, we might get the value directly
+            if (typeof result.toString === 'function' && result.toString().match(/^[0-9]+$/)) {
+              amountOut = result;
+            } else {
+              // Attempt to extract value based on common patterns
+              amountOut = result[0] || result.amountOut || result._hex || result.value || result;
+            }
+          }
+          
+          console.log(`Found valid amountOut: ${amountOut.toString()}`);
+          
+          // Format to display as a readable number
+          var readableAmountOut2Output = ethers.formatEther(amountOut);
+          var readableAmountIN2Input = ethers.formatUnits(amountToSwap, 8);
+
+
+        if(tokenInputAddress==Address_ZEROXBTC_TESTNETCONTRACT){
+
+
+
+        }else{
+
+           readableAmountOut2Output = ethers.formatUnits(amountOut, 8);
+          readableAmountIN2Input = ethers.formatEther(amountToSwap);
+          
+        }
+
+
+        // Fix the BigInt arithmetic issue
+        if (typeof amountOut === 'bigint') {
+          MinamountOut = amountOut - 10n; // Use 10n for BigInt
+        } else {
+          MinamountOut = amountOut - 10;
+        }
+
+        
+
+          console.log(`Predicted amountOut: ${amountToSwap} tokens swap-> ${MinamountOut} tokens`);
+          console.log(`Predicted amountOut: ${readableAmountIN2Input} tokens swap-> ${readableAmountOut2Output} tokens`);
+        } catch (error) {
+          console.error(`Error finding valid getOutput for swap:`, error);
+        }
+
+
+
+
+
+
+console.log("\n\n!!!!!!!!!!!!!!!!!!!SWAPTWO TOKENS STUFF INFO BELOW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+console.log("TokenAddress: ", tokenAddress);
+console.log("Address_ZEROXBTC_TESTNETCONTRACT: ", Address_ZEROXBTC_TESTNETCONTRACT);
+console.log("TokenIn: ", tokenAddress);
+console.log("TokenOut: ", Address_ZEROXBTC_TESTNETCONTRACT);
+console.log("AmountIn: ", amountToSwap);
+console.log("MinAmountOut: ", MinamountOut);
+console.log("HookAddress: ", HookAddress);
+console.log("WheretoSendFunds: ", deployer.address);
+     try {
+        // Call the view function
+        const tx = await tokenSwapper.swapTokenTWOTOKENS(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, amountToSwap, MinamountOut, HookAddress, deployer.address, {
+  gasPrice: doubledGasPrice
+     });
+        
+        
+      console.log("swapTokenTWOTOKENS AFter fee update transaction sent:", tx.hash);
+          await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding swapTokenTWOTOKENS stuff`, error);
+      }
+
+
+
+
+
+
+
+
+
+      console.log("Swapped");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      amountOut = 0;
+
+      try {
+        var tokenInputAddress = tokenAddress;
+        // Call the view function
+        const result = await tokenSwapper.getOutput.staticCall(Address_ZEROXBTC_TESTNETCONTRACT, tokenAddress, tokenInputAddress, HookAddress, amountToSwap);
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          
+          
+          if (typeof result === 'bigint' || typeof result === 'number') {
+            // If it's already a primitive value
+            amountOut = result;
+          } else if (result._isBigNumber || result instanceof ethers.BigNumber) {
+            // For ethers v5 BigNumber
+            amountOut = result;
+          } else if (typeof result === 'object' && result !== null) {
+            // For objects, try to extract the value
+            // With ethers v6, we might get the value directly
+            if (typeof result.toString === 'function' && result.toString().match(/^[0-9]+$/)) {
+              amountOut = result;
+            } else {
+              // Attempt to extract value based on common patterns
+              amountOut = result[0] || result.amountOut || result._hex || result.value || result;
+            }
+          }
+          
+          console.log(`Found valid amountOut: ${amountOut.toString()}`);
+          
+          // Format to display as a readable number
+          var readableAmountOut2Output = ethers.formatEther(amountOut);
+          var readableAmountIN2Input = ethers.formatUnits(amountToSwap, 8);
+
+
+        if(tokenInputAddress==Address_ZEROXBTC_TESTNETCONTRACT){
+
+
+
+        }else{
+
+           readableAmountOut2Output = ethers.formatUnits(amountOut, 8);
+          readableAmountIN2Input = ethers.formatEther(amountToSwap);
+          
+        }
+
+
+        // Fix the BigInt arithmetic issue
+        if (typeof amountOut === 'bigint') {
+          MinamountOut = amountOut - 10n; // Use 10n for BigInt
+        } else {
+          MinamountOut = amountOut - 10;
+        }
+
+        
+
+          console.log(`Predicted amountOut: ${amountToSwap} tokens for ${MinamountOut} tokens input`);
+          console.log(`Predicted amountOut: ${readableAmountIN2Input} tokens for ${readableAmountOut2Output} tokens input`);
+        } catch (error) {
+          console.error(`Error finding valid getOutput for swap:`, error);
+        }
+
+
+
+
+
+
+console.log("\n\n!!!!!!!!!!!!!!!!!!!SWAPTWO TOKENS STUFF INFO BELOW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+console.log("TokenAddress: ", tokenAddress);
+console.log("Address_ZEROXBTC_TESTNETCONTRACT: ", Address_ZEROXBTC_TESTNETCONTRACT);
+console.log("TokenIn: ", tokenAddress);
+console.log("TokenOut: ", Address_ZEROXBTC_TESTNETCONTRACT);
+console.log("AmountIn: ", amountToSwap);
+console.log("MinAmountOut: ", MinamountOut);
+console.log("HookAddress: ", HookAddress);
+console.log("WheretoSendFunds: ", deployer.address);
+     try {
+        // Call the view function
+        const tx = await tokenSwapper.swapTokenTWOTOKENS(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, amountToSwap, MinamountOut, HookAddress, deployer.address, {
+  gasPrice: doubledGasPrice
+     });
+        
+        
+      console.log("swapTokenTWOTOKENS AFter fee update transaction sent:", tx.hash);
+          await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding swapTokenTWOTOKENS stuff`, error);
+      }
+
+
+
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var amount0LP = 0;
+var amount1LP = 0;
+let amount0LPfees11 = 0;
+let amount1LPfees11 = 0;
+
+let total011 = 0;
+let total111 = 0;
+      try {
+        // Call the view function
+        // Call the view function
+          const result = await LPRewards.getMaxRedeemableTokens(NFTTOkenID, tokenAddress_Swapper);
+
+                                            // After destructuring
+              amount0LPfees = result[0];
+              amount1LPfees = result[1];
+              amount0LP = result[2];
+              amount1LP = result[3];
+
+
+                        // Now .add() will work
+            // Add BigInts with the + operator
+            total011 = amount0LP + amount0LPfees;
+            total111 = amount1LP + amount1LPfees;
+          console.log("LP_Rewards getTokenAmountForPercentageLiquidity Result amount0LP:", amount0LP);
+          console.log("LP_Rewards getTokenAmountForPercentageLiquidity Result amount1LP:", amount1LP);
+        } catch (error) {
+          console.error(`Error getTokenAmountForPercentageLiquidity:`, error);
+        }
+
+
+   // console.log("https://app.uniswap.org/positions/v4/ethereum_sepolia/"+NFTTOkenID);
+    console.log(`Should have amount0: ${ethers.formatEther(amount0LP)}  amount1: ${ethers.formatEther(amount1LP)}`);
+    console.log(`Should have amount0LPfees: ${ethers.formatEther(amount0LPfees)}  amount1LPfees: ${ethers.formatEther(amount1LPfees)}`);
+
+        console.log("Totaled together ==================");
+     // console.log(`After next command we will net removed from position total0: ${ethers.formatEther(total011)}  total1: ${ethers.formatEther(total111)}`);
+
+
+// Constants - ethers v6 uses native BigInt
+var liquidityToRemove = 5000000000000n;
+var denominator = 10000000000000n;
+var numeratorMultiplier = 3n;
+var baseDivider = 4n;
+
+
+console.log("amount0LP : ",amount0LP);
+console.log("amount1LP : ",amount1LP);
+console.log("liquidityToRemove : ",liquidityToRemove);
+console.log("denominator : ",denominator);
+console.log("numeratorMultiplier : ",numeratorMultiplier);
+console.log("baseDivider : ",baseDivider);
+// Math operations using native BigInt
+// Math operations using native BigInt
+var amount0Min = (amount0LP * numeratorMultiplier * liquidityToRemove) / (baseDivider * denominator);
+
+var amount1Min = (amount1LP * numeratorMultiplier * liquidityToRemove) / (baseDivider * denominator);
+
+//if U call above 80% it will fail the next decrease since there will be nothing left
+     try {
+        // Call the view function
+        //percentageToRemoveOutOf10000000000000 so 100 = 10000/10000000000000 = 0.000000001 * 100 = 0.0000001%
+        const tx = await tokenSwapper.DecreaseLiqONLPRewards(NFTTOkenID, 5000000000000, amount0Min, amount1Min, {
+  gasPrice: doubledGasPrice
+});
+
+
+        
+      console.log("should be small small amount of fees going to our staking contract tx hash sent:", tx.hash);
+         
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding DecreaseLiqONLPRewards`, error);
+      }
+
+      console.log("DecreaseLiqONLPRewards ");
+
+      console.log("should be small small amount of fees on staking contract");
+
+
+
+var amount0LP = 0;
+var amount1LP = 0;
+      try {
+        // Call the view function
+        // Call the view function
+          const result = await LPRewards.getMaxRedeemableTokens(NFTTOkenID, tokenAddress_Swapper);
+
+                                            // After destructuring
+              amount0LPfees = result[0];
+              amount1LPfees = result[1];
+              amount0LP = result[2];
+              amount1LP = result[3];
+
+
+                        // Now .add() will work
+            // Add BigInts with the + operator
+            total011 = amount0LP + amount0LPfees;
+            total111 = amount1LP + amount1LPfees;
+          console.log("LP_Rewards getTokenAmountForPercentageLiquidity Result amount0LP:", amount0LP);
+          console.log("LP_Rewards getTokenAmountForPercentageLiquidity Result amount1LP:", amount1LP);
+        } catch (error) {
+          console.error(`Error getTokenAmountForPercentageLiquidity:`, error);
+        }
+
+
+
+// Constants - ethers v6 uses native BigInt
+var liquidityToRemove = 100000000000n;
+var denominator = 10000000000000n;
+var numeratorMultiplier = 3n;
+var baseDivider = 4n;
+
+
+console.log("amount0LP : ",amount0LP);
+console.log("amount1LP : ",amount1LP);
+console.log("liquidityToRemove : ",liquidityToRemove);
+console.log("denominator : ",denominator);
+console.log("numeratorMultiplier : ",numeratorMultiplier);
+console.log("baseDivider : ",baseDivider);
+// Math operations using native BigInt
+// Math operations using native BigInt
+var amount0Min = (amount0LP * numeratorMultiplier * liquidityToRemove) / (baseDivider * denominator);
+
+var amount1Min = (amount1LP * numeratorMultiplier * liquidityToRemove) / (baseDivider * denominator);
+
+console.log("\n\nStats where error occurs: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
+console.log("NFTTOkenID : ",NFTTOkenID);
+console.log("100000000000n : ",100000000000n);
+
+console.log("amount0Min : ",amount0Min);
+
+console.log("amount1Min : ",amount1Min);
+
+
+     try {
+        // Call the view function
+        //percentageToRemoveOutOf10000000000000 so 100 = 10000/10000000000000 = 0.000000001 * 100 = 0.0000001%
+        const tx = await tokenSwapper.DecreaseLiqONLPRewards(NFTTOkenID, 100000000000, amount0Min, amount1Min, {
+  gasPrice: doubledGasPrice
+});
+        
+        
+      console.log("should be small small amount of fees going to our staking contract tx hash sent:", tx.hash);
+         
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding DecreaseLiqONLPRewards`, error);
+      }
+
+      console.log("DecreaseLiqONLPRewards ");
+
+      console.log("should be small small amount of fees on staking contract");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     try {
+        // Call the view function
+
+        const tx = await LPRewards.collectFeesForNFT(NFTTOkenID, {
+  gasPrice: doubledGasPrice
+});
+        //const tx = await tokenSwapper.getUnsiwapv4Fees( NFTTOkenID, tokenAddress, deployer.address);
+        
+        
+      console.log("collectFeesForNFT collectFeesForNFT tx sent:", tx.hash);
+         
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding getUnsiwapv4Fees`, error);
+      }
+
+      console.log("another swap please my good sir");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     try {
+  // Call the view function
+        const tx = await LPRewards.addRewardToken("0x4200000000000000000000000000000000000006");
+        
+      console.log("addRewardToken transaction sent:", tx.hash);
+      console.log("Waiting for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("addRewardToken transaction confirmed in block:", receipt.blockNumber);
+      
+
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+
+      } catch (error) {
+        console.error(`Error creating position`, error);
+      }
+
+
+
+
+     try {
+  // Call the view function
+        const tx = await LPRewards.addRewardToken(Address_ZEROXBTC_TESTNETCONTRACT);
+        
+      console.log("addRewardToken transaction sent:", tx.hash);
+      console.log("Waiting for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("addRewardToken 4 Address_ZEROXBTC_TESTNETCONTRACT transaction confirmed in block:", receipt.blockNumber);
+      
+
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+
+      } catch (error) {
+        console.error(`Error creating position`, error);
+      }
+
+
+
+      
+
+
+
+     try {
+  // Call the view function
+        const tx = await LPRewards.addRewardToken(tokenAddress);
+        
+      console.log("addRewardTokenERC20 transaction sent:", tx.hash);
+      console.log("Waiting for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("addRewardTokenERC20 addRewardTokenERC20 confirmed in block:", receipt.blockNumber);
+      
+
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+
+      } catch (error) {
+        console.error(`Error creating position`, error);
+      }
+
+
+
+
+     try {
+  // Call the view function
+        const tx = await LPRewards.convertETHtoWETH();
+        
+      console.log("convertETHtoWETH transaction sent:", tx.hash);
+      console.log("Waiting for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("convertETHtoWETH transaction confirmed in block:", receipt.blockNumber);
+      
+
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+
+      } catch (error) {
+        console.error(`Error creating position`, error);
+      }
+
+
+console.log("convertETHtoWETHconvertETHtoWETHconvertETHtoWETHconvertETHtoWETHconvertETHtoWETHconvertETHtoWETH");
+      
+
+await sleep(15);
+
+
+
+      try {
+        // Call the view function
+        const result = await LPRewards.getPriceRatio();
+
+
+
+
+
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          ratioz = result[0];
+            token0 = result[1];
+            token1 = result[2];
+            token0Decimals = result[3];
+            token1Decimals = result[4];
+
+            console.log("token0 = ", token0," decimals: ", token0Decimals);
+            console.log("token1 = ", token1," decimals: ", token1Decimals);
+            console.log("token0 = ", token0," decimals: ", token0Decimals);
+            console.log("token1 = ", token1," decimals: ", token1Decimals);
+            console.log("token0 = ", token0," decimals: ", token0Decimals);
+            console.log("token1 = ", token1," decimals: ", token1Decimals);
+
+
+          
+          console.log(`Found valid Ratio x10**18: ${ratioz.toString()}`);
+          
+          // Format to display as a readable number
+          const readableAmountOut = ethers.formatEther(ratioz);
+          console.log(`Found valid Ratio x10**18: ${readableAmountOut} mutliplier`);
+        } catch (error) {
+          console.error(`Error finding valid getOutput for swap:`, error);
+        }
+
+
+
+
+
+
+     try {
+  // Call the view function
+        const tx = await LPRewards.setRewardParams(tokenAddress);
+        
+      console.log("setRewardParams transaction sent:", tx.hash);
+      console.log("Waiting for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("setRewardParams setRewardParams confirmed in block:", receipt.blockNumber);
+      
+
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+
+      } catch (error) {
+        console.error(`Error creating position`, error);
+      }
+
+
+/* We dont set rewardparams for WETH since there is 0 in staking contract it wont run
+     try {
+  // Call the view function
+        const tx = await LPRewards.setRewardParams("0x4200000000000000000000000000000000000006");
+        
+      console.log("setRewardParams transaction sent:", tx.hash);
+      console.log("Waiting for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("setRewardParams2 setRewardParams2 confirmed in block:", receipt.blockNumber);
+      
+
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+
+      } catch (error) {
+        console.error(`Error creating position`, error);
+      }
+
+*/
+      
+  try {
+  // Call the view function
+        const tx = await LPRewards.setRewardParams(Address_ZEROXBTC_TESTNETCONTRACT);
+        
+      console.log("setRewardParams transaction sent:", tx.hash);
+      console.log("Waiting for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("setRewardParams 4 Address_ZEROXBTC_TESTNETCONTRACT confirmed in block:", receipt.blockNumber);
+      
+
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+
+      } catch (error) {
+        console.error(`Error creating position`, error);
+      }
+
+console.log("SUCCESS OF setRewardParams 4 Address_ZEROXBTC_TESTNETCONTRACT");
+
+
+
+
+
+
+
+      
+  let liquidityInStaking = [];
+  let totalPooLLiquidity = [];
+  let total0xBTCStaked = [];
+  let totalB0xStaked = [];
+
+
+      try {
+        // Call the view function
+        const result = await LPRewards.getContractTotals();
+
+
+   liquidityInStaking = result[0];
+   totalPooLLiquidity = result[1];
+   total0xBTCStaked = result[2];
+   totalB0xStaked = result[3];
+
+   
+        console.log("   Liquidity in staking:", liquidityInStaking.toString());     // Now properly typed as address
+        console.log("   Liquidity in staking:", totalPooLLiquidity.toString());     // Now properly typed as address
+        console.log("   Total 0xBTC Staked(ETH for now):", total0xBTCStaked.toString());     // Now properly typed as address
+        console.log("   Total b0x Staked:", totalB0xStaked.toString());     // Now properly typed as address
+        } catch (error) {
+          console.error(`Error finding valid getContractTotals for swap:`, error);
+        }
+
+
+
+
+
+
+
+
+
+console.log("getting getMaxUniswapIDPossible!");
+var MAXTOKENPOSSIBLE = 0;
+var maxTokenPossible =0;
+      try {
+        // Call the view function
+        const result = await positionFinder.getMaxUniswapIDPossible()
+
+
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          
+          if (typeof result === 'bigint' || typeof result === 'number') {
+            // If it's already a primitive value
+            MAXTOKENPOSSIBLE = result;
+          } else if (result._isBigNumber || result instanceof ethers.BigNumber) {
+            // For ethers v5 BigNumber
+            MAXTOKENPOSSIBLE = result;
+          } else if (typeof result === 'object' && result !== null) {
+            // For objects, try to extract the value
+            // With ethers v6, we might get the value directly
+            if (typeof result.toString === 'function' && result.toString().match(/^[0-9]+$/)) {
+              MAXTOKENPOSSIBLE = result;
+            } else {
+              // Attempt to extract value based on common patterns
+              MAXTOKENPOSSIBLE = result[0] || result.amountOut || result._hex || result.value || result;
+            }
+          }
+          
+          console.log(`Found valid Uniswap v4 MAXTOKEN POSSIBLE: ${MAXTOKENPOSSIBLE.toString()}`);
+
+        // CONVERT TO REGULAR NUMBER FOR LOOP
+        if (typeof MAXTOKENPOSSIBLE === 'bigint') {
+          maxTokenPossible = Number(MAXTOKENPOSSIBLE);
+        } else if (MAXTOKENPOSSIBLE._isBigNumber || MAXTOKENPOSSIBLE instanceof ethers.BigNumber) {
+          // For ethers v5
+          maxTokenPossible = MAXTOKENPOSSIBLE.toNumber();
+        } else if (typeof MAXTOKENPOSSIBLE.toString === 'function') {
+          // For ethers v6 or other BigInt-like objects
+          maxTokenPossible = Number(MAXTOKENPOSSIBLE.toString());
+        } else {
+          maxTokenPossible = Number(MAXTOKENPOSSIBLE);
+        }
+
+        console.log(`Converted to number for loop: ${maxTokenPossible}`);
+        } catch (error) {
+          console.error(`Error finding valid getMaxUniswapIDPossible for swap:`, error);
+        }
+
+
+
+
+
+
+/*
+// Position Manager contract setup
+const POSITION_MANAGER_ADDRESS = "0x4B2C77d209D3405F41a037Ec6c77F7F5b8e2ca80"; // Replace with actual V4 address
+const positionManagerABI = [
+  {
+    "inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}],
+    "name": "getPoolAndPositionInfo",
+    "outputs": [
+      {
+        "internalType": "struct PoolKey",
+        "name": "poolKey",
+        "type": "tuple",
+        "components": [
+          {"internalType": "address", "name": "currency0", "type": "address"}, // Changed from Currency
+          {"internalType": "address", "name": "currency1", "type": "address"}, // Changed from Currency  
+          {"internalType": "uint24", "name": "fee", "type": "uint24"},
+          {"internalType": "int24", "name": "tickSpacing", "type": "int24"},
+          {"internalType": "address", "name": "hooks", "type": "address"} // Changed from IHooks
+        ]
+      },
+      {"internalType": "uint256", "name": "info", "type": "uint256"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address", "name": "owner", "type": "address"}],
+    "name": "balanceOf",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}],
+    "name": "ownerOf",
+    "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
+  
+  const positionManager = new hre.ethers.Contract(
+    POSITION_MANAGER_ADDRESS,
+    positionManagerABI,
+    signer
+  );*/
+
+
+// Helper function for 24-bit sign extension
+function signExtend24Bit(value) {
+  const SIGN_BIT = 0x800000; // Bit 23 for 24-bit numbers
+  const MASK_24BIT = 0xFFFFFF;
+  
+  if (value & SIGN_BIT) {
+    // Negative number - extend with 1s
+    return (value | (~MASK_24BIT)) | 0; // | 0 converts to 32-bit signed int
+  } else {
+    // Positive number
+    return value;
+  }
+}
+// Direct JavaScript equivalents of your Solidity functions
+function TOtickLower(info) {
+  const TICK_LOWER_OFFSET = 8;
+  const shifted = Number((BigInt(info) >> BigInt(TICK_LOWER_OFFSET)) & 0xFFFFFFn);
+  return signExtend24Bit(shifted);
+}
+
+function TOtickUpper(info) {
+  const TICK_UPPER_OFFSET = 32;
+  const shifted = Number((BigInt(info) >> BigInt(TICK_UPPER_OFFSET)) & 0xFFFFFFn);
+  return signExtend24Bit(shifted);
+}
+
+
+  
+
+
+  console.log("DOING findAllUsersTokenIDSinStaking CHECKING findAllUsersTokenIDSinStaking function first!");
+
+try {
+  const maxLoopLookups = 1000;
+  var startSearchAt = 0; // Start searching from token ID 0
+  const totalRange = maxTokenPossible - startSearchAt;
+  const NumberOfLoops = Math.ceil(totalRange / maxLoopLookups);
+  
+  // Initialize as empty arrays (not undefined)
+  let ownedTokenIds = [];
+  let OWNEDtOKEN1 = [];
+  let OWNEDtOKEN2 = [];
+  let liquidity = [];
+  let feesOwedToken1 = [];
+  let feesOwedToken2 = [];
+  let poolKeyi = [];
+  let poolInfoi = [];
+  
+  for (let x = 0; x < NumberOfLoops; x++) {
+    const startId = startSearchAt + (maxLoopLookups * x);
+    const endId = Math.min(startId + maxLoopLookups - 1, maxTokenPossible);
+    
+    console.log("Looking at NFT ids in this search IDS:", startId, "to", endId);
+    
+    const result = await positionFinder.findAllUsersTokenIDSinStaking(
+      startId, 
+      endId, 
+      tokenAddress, 
+      Address_ZEROXBTC_TESTNETCONTRACT,
+      HookAddress,
+      0
+    );
+    
+    // Concatenate arrays properly using spread operator or concat
+    ownedTokenIds = ownedTokenIds.concat(result[0]);
+    OWNEDtOKEN1 = OWNEDtOKEN1.concat(result[1]);
+    OWNEDtOKEN2 = OWNEDtOKEN2.concat(result[2]);
+    liquidity = liquidity.concat(result[3]);
+    feesOwedToken1 = feesOwedToken1.concat(result[4]);
+    feesOwedToken2 = feesOwedToken2.concat(result[5]);
+    poolKeyi = poolKeyi.concat(result[6]);
+    poolInfoi = poolInfoi.concat(result[7]);
+
+  }
+
+
+
+
+  console.log("Number of tokens owned By rewards Contract:", ownedTokenIds.length);
+  console.log("Owned Token IDs by rewards Contract:", ownedTokenIds.map(id => id.toString()));
+  
+  // Now loop through each token ID to get position details
+  for (let i = 0; i < ownedTokenIds.length; i++) {
+    const tokenId = ownedTokenIds[i];
+    
+    try {
+        // Get pool and position info using V4 method with corrected types
+       // const [poolKey, info2] = await positionManager.getPoolAndPositionInfo(tokenId);
+        poolKey = poolKeyi[i];
+        info2 = poolInfoi[i];
+        console.log(`Token ID ${tokenId.toString()}:`);
+        console.log(" Pool Key:");
+        console.log("   Currency0:", poolKey.currency0);     // Now properly typed as address
+        console.log("   Currency1:", poolKey.currency1);     // Now properly typed as address
+        console.log("   Fee:", poolKey.fee.toString());
+        console.log("   Tick Spacing:", poolKey.tickSpacing.toString());
+        console.log("   Hooks:", poolKey.hooks);             // Now properly typed as address
+        console.log(" Position Info (packed):", info2.toString());
+        
+
+  
+  const decodedInfo = {
+    tickLower: TOtickLower(info2.toString()),
+    tickUpper: TOtickUpper(info2.toString())
+  };
+
+
+
+
+        console.log(" Decoded Position Info:");
+        console.log("   Tick Lower:", decodedInfo.tickLower);
+        console.log("   Tick Upper:", decodedInfo.tickUpper);
+        console.log("   tOKEN 1 AMOUNT:",OWNEDtOKEN1[i].toString());
+        console.log("   tOKEN 2 AMOUNT:",OWNEDtOKEN2[i].toString());
+        console.log("   Liquidity:", liquidity[i]);
+        console.log("   FEES OWED Token 1 AMOUNT:",feesOwedToken1[i].toString());
+        console.log("   FEES OWED Token 2 AMOUNT:",feesOwedToken2[i].toString());
+      
+    } catch (positionError) {
+      console.error(`Error getting position details for token ${tokenId}:`, positionError);
+    }
+
+  }
+  
+} catch (error) {
+  console.error(`Error findUserTokenIds:`, error);
+}
+
+
+
+  console.log("Calling findUserTokenIds to find all tokens owned by tokenAddress_Rewards aka Staking Contract");
+
+
+try {
+  const maxLoopLookups = 1000;
+  var startSearchAt = 0; // Start searching from token ID 0
+  const totalRange = maxTokenPossible - startSearchAt;
+  const NumberOfLoops = Math.ceil(totalRange / maxLoopLookups);
+  
+  // Initialize as empty arrays (not undefined)
+  let ownedTokenIds = [];
+  let OWNEDtOKEN1 = [];
+  let OWNEDtOKEN2 = [];
+  let liquidity = [];
+  let feesOwedToken1 = [];
+  let feesOwedToken2 = [];
+  let poolKeyi = [];
+  let poolInfoi = [];
+  
+  for (let x = 0; x < NumberOfLoops; x++) {
+    const startId = startSearchAt + (maxLoopLookups * x);
+    const endId = Math.min(startId + maxLoopLookups - 1, maxTokenPossible);
+    
+    console.log("Looking at NFT ids in this search IDS:", startId, "to", endId);
+    
+    const result = await positionFinder.findUserTokenIdswithMinimum(
+      tokenAddress_Rewards, 
+      startId, 
+      endId, 
+      tokenAddress, 
+      Address_ZEROXBTC_TESTNETCONTRACT,
+      HookAddress,
+      0
+    );
+    
+    // Concatenate arrays properly using spread operator or concat
+    ownedTokenIds = ownedTokenIds.concat(result[0]);
+    OWNEDtOKEN1 = OWNEDtOKEN1.concat(result[1]);
+    OWNEDtOKEN2 = OWNEDtOKEN2.concat(result[2]);
+    liquidity = liquidity.concat(result[3]);
+    feesOwedToken1 = feesOwedToken1.concat(result[4]);
+    feesOwedToken2 = feesOwedToken2.concat(result[5]);
+    poolKeyi = poolKeyi.concat(result[6]);
+    poolInfoi = poolInfoi.concat(result[7]);
+
+  }
+
+
+
+
+  console.log("Number of tokens owned By rewards Contract:", ownedTokenIds.length);
+  console.log("Owned Token IDs by rewards Contract:", ownedTokenIds.map(id => id.toString()));
+  
+  // Now loop through each token ID to get position details
+  for (let i = 0; i < ownedTokenIds.length; i++) {
+    const tokenId = ownedTokenIds[i];
+    
+    try {
+        // Get pool and position info using V4 method with corrected types
+       // const [poolKey, info2] = await positionManager.getPoolAndPositionInfo(tokenId);
+        poolKey = poolKeyi[i];
+        info2 = poolInfoi[i];
+        console.log(`Token ID ${tokenId.toString()}:`);
+        console.log(" Pool Key:");
+        console.log("   Currency0:", poolKey.currency0);     // Now properly typed as address
+        console.log("   Currency1:", poolKey.currency1);     // Now properly typed as address
+        console.log("   Fee:", poolKey.fee.toString());
+        console.log("   Tick Spacing:", poolKey.tickSpacing.toString());
+        console.log("   Hooks:", poolKey.hooks);             // Now properly typed as address
+        console.log(" Position Info (packed):", info2.toString());
+        
+
+  
+  const decodedInfo = {
+    tickLower: TOtickLower(info2.toString()),
+    tickUpper: TOtickUpper(info2.toString())
+  };
+
+
+
+
+        console.log(" Decoded Position Info:");
+        console.log("   Tick Lower:", decodedInfo.tickLower);
+        console.log("   Tick Upper:", decodedInfo.tickUpper);
+        console.log("   tOKEN 1 AMOUNT:",OWNEDtOKEN1[i].toString());
+        console.log("   tOKEN 2 AMOUNT:",OWNEDtOKEN2[i].toString());
+        console.log("   Liquidity:", liquidity[i]);
+        console.log("   FEES OWED Token 1 AMOUNT:",feesOwedToken1[i].toString());
+        console.log("   FEES OWED Token 2 AMOUNT:",feesOwedToken2[i].toString());
+      
+    } catch (positionError) {
+      console.error(`Error getting position details for token ${tokenId}:`, positionError);
+    }
+
+  }
+  
+} catch (error) {
+  console.error(`Error findUserTokenIds:`, error);
+}
+
+  console.log("Calling getIDSofStakedTokensForUser of tokenAddress_Swapper");
+// Get current time in milliseconds since Unix epoch
+const currentTime = Date.now();
+// If you need it in seconds (like Unix timestamp), divide by 1000
+const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+console.log("Current Time in seconds since epoch", currentTimeInSeconds); // e.g., 1717974123
+
+
+
+      try {
+        // Call the view function
+        // Call the view function
+          const result = await positionFinder.getIDSofStakedTokensForUserwithMinimum(tokenAddress_Swapper, tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, HookAddress, 0);
+
+                  
+  // result is already the array of token IDs
+  const ownedTokenIdsOFSwapperOnStaked = result[0]; // This is uint256[] - array of token IDs
+  var OWNEDtOKEN1 = result[1];
+  var OWNEDtOKEN2 = result[2];
+  var liquidity = result[3];
+  var timeStakedAT1 = result[4];
+  var PenaltyForWithdraw = result[5];
+  
+  console.log("Calling getIDSofStakedTokensForUser of tokenAddress_Swapper");
+  console.log("Calling getIDSofStakedTokensForUser of tokenAddress_Swapper");
+  console.log("Number of tokens owned By OUR Contract:", ownedTokenIdsOFSwapperOnStaked.length);
+  console.log("Owned NFT by OUR ContraT:", ownedTokenIdsOFSwapperOnStaked.map(id => id.toString()));
+  
+  // Now loop through each token ID to get position details
+  for (let i = 0; i < ownedTokenIdsOFSwapperOnStaked.length; i++) {
+    const tokenId = ownedTokenIdsOFSwapperOnStaked[i];
+    
+    try {
+        // Get pool and position info using V4 method with corrected types
+        const [poolKey, info2] = await positionManager.getPoolAndPositionInfo(tokenId);
+        
+        console.log(`Token ID ${tokenId.toString()}:`);
+        console.log(" Pool Key:");
+        console.log("   Currency0:", poolKey.currency0);     // Now properly typed as address
+        console.log("   Currency1:", poolKey.currency1);     // Now properly typed as address
+        console.log("   Fee:", poolKey.fee.toString());
+        console.log("   Tick Spacing:", poolKey.tickSpacing.toString());
+        console.log("   Hooks:", poolKey.hooks);             // Now properly typed as address
+        console.log(" Time Staked AT:", timeStakedAT1[i].toString());
+        console.log(" Position Info (packed):", info2.toString());
+        
+//just add function decodePositionInfo(packedInfo) { and return the decodedInfo if u want standalone function
+
+ 
+  
+  const decodedInfo = {
+    tickLower: TOtickLower(info2.toString()),
+    tickUpper: TOtickUpper(info2.toString())
+  };
+
+
+
+        console.log(" Decoded Position Info:");
+        console.log("   Tick Lower:", decodedInfo.tickLower);
+        console.log("   Tick Upper:", decodedInfo.tickUpper);
+        console.log("   Liquidity:", liquidity[i]);
+        console.log("   tOKEN 1 AMOUNT Staked:",OWNEDtOKEN1[i].toString());
+        console.log("   tOKEN 2 AMOUNT Staked:",OWNEDtOKEN2[i].toString());
+        console.log(" Time Staked AT:", timeStakedAT1[i].toString());
+        const timetotal = currentTimeInSeconds - Number(timeStakedAT1[i]);
+        console.log(" total staked position time", timetotal.toString());
+        console.log("Penalty for withdraw = ", PenaltyForWithdraw);
+        console.log("Penalty withdraw % = ", (PenaltyForWithdraw/1000*100)," %");
+      
+    } catch (positionError) {
+      console.error(`Error getting position details for token ${tokenId}:`, positionError);
+    }
+
+
+  }
+  
+} catch (error) {
+  console.error(`Error findUserTokenIds:`, error);
+}
+
+
+
+
+      console.log("sleep for 100seconds we did everything then we do some some reward collecting");
+     await sleep(100 * 1000);
+
+
+
+
+
+
+
+
+
+     try {
+  // Call the view function
+        const tx = await tokenSwapper.collectProfit();
+        
+      console.log("collectProfit transaction sent:", tx.hash);
+      console.log("collectProfit transaction sent:", tx.hash);
+      console.log("collectProfit transaction sent:", tx.hash);
+      console.log("collectProfit for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("collectProfit collectProfit confirmed in block:", receipt.blockNumber);
+      
+
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+
+      } catch (error) {
+        console.error(`Error creating position`, error);
+      }
+      console.log("MOLLY DOG DID IT!");
+
+
+
+      console.log("sleep for 200seconds we did everything then we do some some");
+
+      await sleep(200 * 1000);
+     try {
+  // Call the view function
+        const tx = await tokenSwapper.collectProfit();
+        
+      console.log("collectProfit2 transaction sent:", tx.hash);
+      console.log("collectProfit for transaction confirmation...");
+      
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log("collectProfit2 collectProfit2 confirmed in block:", receipt.blockNumber);
+      
+
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+
+      } catch (error) {
+        console.error(`Error creating position`, error);
+      }
+      console.log("collectProfit2 DOG DID IT!");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      console.log(" SO Done Done Done Done DONE DONE we Swapped to ETH AGAIN");
+      console.log("LETS GET FEES WITHDRAW_NFTintoStakingContract calling")
+
+
+
+     try {
+        // Call the view function
+
+        // const tx = await tokenSwapper.WITHDRAW_NFTintoStakingContract(NFTTOkenID, {
+         const tx = await tokenSwapper.exitStaking({
+  gasPrice: doubledGasPrice
+});
+        //const tx = await tokenSwapper.getUnsiwapv4Fees( NFTTOkenID, tokenAddress, deployer.address);
+        
+        
+      console.log("exitStaking exitStaking!! transaction sent:", tx.hash);
+      console.log("exitStaking exitStaking!! transaction sent:", tx.hash);
+      console.log("exitStaking exitStaking!! transaction sent:", tx.hash);
+         
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding WITHDRAW_NFTintoStakingContractcheck`, error);
+      }
+
+
+      
+      console.log("WITHDRAW_NFTintoStakingContractcheck DONE please my good sir");
+
+
+  console.log("WITHDRAW_NFTintoStakingContractcheck DONE please my good sir");
+
+
+
+
+
+
+     try {
+        // Call the view function
+
+        // const tx = await tokenSwapper.WITHDRAW_NFTintoStakingContract(NFTTOkenID, {
+         const tx = await tokenSwapper.withdrawNFT(NFTTOkenID, {
+  gasPrice: doubledGasPrice
+});
+        //const tx = await tokenSwapper.getUnsiwapv4Fees( NFTTOkenID, tokenAddress, deployer.address);
+        
+        
+      console.log("withdrawNFT FROM CONTRACT TO OURS FOR SAFE KEEPING:", tx.hash);
+      console.log("withdrawNFT FROM CONTRACT TO OURS FOR SAFE KEEPING:", tx.hash);
+         
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+        // If you want to use these values for further operations
+        // For example, if there's a deploy function that uses the salt
+        // await UniV4Hook.deploy(validSalt);
+        
+      } catch (error) {
+        console.error(`Error finding WITHDRAW_NFTintoStakingContractcheck`, error);
+      }
+
+
+      
+      console.log("WITHDRAW_NFTintoStakingContractcheck DONE please my good sir");
+
+
+  console.log("WITHDRAW_NFTintoStakingContractcheck DONE please my good sir");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  }
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
