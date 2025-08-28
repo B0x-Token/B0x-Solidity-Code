@@ -47,11 +47,6 @@ async function main() {
     // Get the deployer's address
     const [deployer] = await hre.ethers.getSigners();
     console.log(`Deploying with account: ${deployer.address}`);
-    
-    // Get contract factory
-    console.log("Getting contract factory...");
-    const B0xToken = await hre.ethers.getContractFactory("B0x_Mainnet");
-    
 
   // Get current fee data using hre (Hardhat Runtime Environment)
   let gasPrice;
@@ -88,21 +83,10 @@ if (gasPrice) {
     doubledGasPrice = gasPrice;
   }
 }
-    const token = await B0xToken.deploy(deployer.address, {
-  gasPrice: doubledGasPrice
-});
-    // Wait for deployment
-    console.log("Waiting for deployment transaction to be mined...");
-    await token.waitForDeployment();
-    
-    // Get the deployed address (ethers v6 way)
-    const tokenAddress = await token.getAddress();
-    console.log(`Token deployed to: ${tokenAddress}`);
-    
-    // Print verification command
-    console.log(`\nTo verify on Etherscan, run: `);
-    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress} "${deployer.address}"  \n\n`);
-    
+
+
+
+
 
     
 
@@ -127,6 +111,48 @@ if (gasPrice) {
     // Print verification command
     console.log(`\nTo verify on Etherscan, run:`);
     console.log(`npx hardhat verify --network baseSepolia ${Address_ZEROXBTC_TESTNETCONTRACT} \n\n`);
+
+    
+
+
+    
+    // Get contract factory
+    console.log("Getting contract factory...");
+    const B0xToken = await hre.ethers.getContractFactory("B0x_Mainnet");
+    
+
+
+    const token = await B0xToken.deploy(deployer.address, Address_ZEROXBTC_TESTNETCONTRACT, {
+  gasPrice: doubledGasPrice
+});
+    // Wait for deployment
+    console.log("Waiting for deployment transaction to be mined...");
+    await token.waitForDeployment();
+    
+    // Get the deployed address (ethers v6 way)
+    const tokenAddress = await token.getAddress();
+    console.log(`Token deployed to: ${tokenAddress}`);
+    
+    // Print verification command
+    console.log(`\nTo verify on Etherscan, run: `);
+    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress} "${deployer.address}" "${Address_ZEROXBTC_TESTNETCONTRACT}" \n\n`);
+    
+var rightsTo0xBitcoinAddress;
+try{
+        // Call the getter function for the public immutable variable
+        const rightsAddress = await token._RightsTo0xBitcoin_Address();
+        
+        console.log('_RightsTo0xBitcoin_Address:', rightsAddress);
+        rightsTo0xBitcoinAddress= rightsAddress;
+        
+    } catch (error) {
+        console.error('Error reading contract variable:', error);
+        throw error;
+    }
+
+    console.log(`\nTo verify RightsTo0xBTC on Etherscan, run: `);
+    console.log(`npx hardhat verify --network baseSepolia ${rightsTo0xBitcoinAddress} \n\n`);
+    
 
     
 // Ensure both addresses are properly formatted (lowercase)
@@ -648,14 +674,17 @@ console.log("?????VERIFICATION SCRIPT BELOW!!!!!!");
     console.log(`\nTo verify on Etherscan, run:`);
 
 
+    console.log(`Test0xBTC deployed to: ${Address_ZEROXBTC_TESTNETCONTRACT}`);
+    console.log(`npx hardhat verify --network baseSepolia ${Address_ZEROXBTC_TESTNETCONTRACT} \n`);
+
     console.log(`Test B0xToken deployed to: ${tokenAddress}`);
-    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress} "${deployer.address}"  \n\n`);
+    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress} "${deployer.address}" "${Address_ZEROXBTC_TESTNETCONTRACT}" \n\n`);
     
 
 
+    console.log(`\nTo verify RightsTo0xBTC on Etherscan, run: `);
+    console.log(`npx hardhat verify --network baseSepolia ${rightsTo0xBitcoinAddress} \n\n`);
 
-    console.log(`Test0xBTC deployed to: ${Address_ZEROXBTC_TESTNETCONTRACT}`);
-    console.log(`npx hardhat verify --network baseSepolia ${Address_ZEROXBTC_TESTNETCONTRACT} \n`);
 
 
     // Print verification command
@@ -663,33 +692,33 @@ console.log("?????VERIFICATION SCRIPT BELOW!!!!!!");
     console.log(`npx hardhat verify --network baseSepolia ${Address_Univ4HookMiner} \n`);
 
       console.log("HOOK DEPLOYED TO HOOKADDRESS: ",HookAddress);
-        console.log(`npx hardhat verify --network baseSepolia ${HookAddress} "${deployer.address}" /n`);
+        console.log(`npx hardhat verify --network baseSepolia ${HookAddress} "${deployer.address}" \n\n`);
 
 
     // Print verification command
-    console.log(`\nTo verify on Etherscan, run:`);
+    console.log(`\nTo verify on Etherscan tokenAddress_Proof_Of_Work , run:`);
     //MINING CONTRACT VERIFICATION NOT YET
-    //console.log(`npx hardhat verify --network baseSepolia ${tokenAddress_Proof_Of_Work} "${tokenAddress}" "${tokenAddress_Rewards}"`);
+    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress_Proof_Of_Work} "${tokenAddress}" "${tokenAddress_Rewards}"`);
 
     
 
     
     console.log(`NFT1155Address deployed to: ${NFT1155Address}`);
-    console.log(`npx hardhat verify --network baseSepolia ${NFT1155Address} "https://forgetoken.org/img/gem.png" "${tokenAddress_Proof_Of_Work}"/n`);
+    console.log(`npx hardhat verify --network baseSepolia ${NFT1155Address} "https://forgetoken.org/img/gem.png" "${tokenAddress_Proof_Of_Work}"\n`);
 
     
 
     console.log(`NFT721 Address deployed to: ${NFT721Address}`);
-    console.log(`npx hardhat verify --network baseSepolia ${NFT721Address} "Test721NFT" "T721" "https://forgetoken.org/img/gem.png" "${tokenAddress_Proof_Of_Work}"/n`);
+    console.log(`npx hardhat verify --network baseSepolia ${NFT721Address} "Test721NFT" "T721" "https://forgetoken.org/img/gem.png" "${tokenAddress_Proof_Of_Work}"\n\n`);
 
     
     // Print verification command
-    console.log(`\nTo verify on Etherscan, run:`);
+    console.log(`\nTo verify on Etherscan address_tokenPooLCreator , run:`);
     console.log(`npx hardhat verify --network baseSepolia ${address_tokenPooLCreator} \n`);
 
 
     console.log(`Univ4MakeSwap deployed to: ${tokenAddress_Swapper}`);
-    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress_Swapper} \n`);
+    console.log(`npx hardhat verify --network baseSepolia ${tokenAddress_Swapper} "${tokenAddress}" \n`);
 
     console.log(`positionFinderPro deployed to: ${tokenAddress_PositionFinder}`);
     console.log(`npx hardhat verify --network baseSepolia ${tokenAddress_PositionFinder} "${tokenAddress_Rewards}" \n\n \n\n \n\n`);
@@ -712,6 +741,8 @@ const tokenAddresses = {
 'B0x': '${tokenAddress}',
 '0xBTC': '${Address_ZEROXBTC_TESTNETCONTRACT}',
 'WETH': '0x4200000000000000000000000000000000000006',
+'RightsTo0xBTC': '${rightsTo0xBitcoinAddress}', //temp until mainnet
+'USDC': '0x036CbD53842c5426634e7929541eC2318f3dCF7e', //temp until mainnet
 };
 
 
@@ -721,8 +752,24 @@ const tokenAddresses = {
         "0x0000000000000000000000000000000000000000": "ETH",
         "${tokenAddress}": "B0x",
         "${Address_ZEROXBTC_TESTNETCONTRACT}": "0xBTC",
+        "${rightsTo0xBitcoinAddress}": "RightsTo0xBTC", //temp until mainnet
+        "0x036CbD53842c5426634e7929541eC2318f3dCF7e": "USDC", //temp until mainnet
         // Add more token mappings as needed
     };
+
+
+   
+
+
+// Token addresses mapping FOR ETHEREUM MAINNET ONLY but using testnet base sepolia instead of mainnet ETH
+  const tokenAddressesETH = {
+      'ETH': '0x0000000000000000000000000000000000000000', // Example addresses
+      'B0x': '${tokenAddress}',
+      '0xBTC': '${Address_ZEROXBTC_TESTNETCONTRACT}',
+      'RightsTo0xBTC': '${rightsTo0xBitcoinAddress}',
+      };
+
+
 
 
 `);
@@ -732,23 +779,8 @@ const tokenAddresses = {
 
 
 
-// Helper function to get token name from address
-function getTokenNameFromAddress(address) {
-    const tokenMap = {
-        "0x4200000000000000000000000000000000000006": "WETH",
-        "0x0000000000000000000000000000000000000000": "ETH",
-        "0x7330812814a0C189f6d84c9f26F0bAA4c53893D3": "B0x",
-        "0x3714367F7C8cF189AD076D250a19BdD736316Ff6": "0xBTC",
-        // Add more token mappings as needed
-    };
-    
-    return tokenMap[address] || `Token${address.slice(-4)}`;
-}
-
-
-
-console.log("Sleep 100 seconds");
-await sleep(100* 1000);
+console.log("Sleep 11 seconds");
+await sleep(11* 1000);
 const amountToApprove = ethers.parseEther("20000000");  // Correctly represents 200 * 10^18
      try {
 
@@ -1059,28 +1091,6 @@ for (const log of receipt.logs) {
 console.log("NFT ID: ", NFTTOkenID);
 console.log("liquiditySalt: ", liquiditySalt);
 
-
-
-      try {
-        // Call the view function
-          const result = await tokenSwapper.findPosition(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, HookAddress, NFTTOkenID);
-
-                  
-          // Destructure the result
-          const poolIDZ = result[0];  // bytes32 pool ID
-          const positionId = result[1];  // bytes32 position ID
-          const fees0 = result[2];       // uint256 fees for token0
-          const fees1 = result[3];       // uint256 fees for token1
-          const salt = result[4];      // boolean indicating if position exists
-
-          console.log("POOL ID:", poolIDZ);
-          console.log("Position ID:", positionId);
-          console.log("Fees Token0:", fees0.toString());
-          console.log("Fees Token1:", fees1.toString());
-          console.log("Pos salt:", salt);
-        } catch (error) {
-          console.error(`Error findPosition:`, error);
-        }
 
 
 
@@ -1920,39 +1930,124 @@ console.log("WheretoSendFunds: ", deployer.address);
 
 
 
+console.log("getting getMaxUniswapIDPossible!");
+var MAXTOKENPOSSIBLE = 0;
+var maxTokenPossible =0;
+      try {
+        // Call the view function
+        const result = await positionFinder.getMaxUniswapIDPossible()
+
+
+
+          // First debug what we're getting back
+          console.log("Raw result type:", typeof result);
+          console.log("Raw result structure:", Object.keys(result).join(", "));
+          
+          if (typeof result === 'bigint' || typeof result === 'number') {
+            // If it's already a primitive value
+            MAXTOKENPOSSIBLE = result;
+          } else if (result._isBigNumber || result instanceof ethers.BigNumber) {
+            // For ethers v5 BigNumber
+            MAXTOKENPOSSIBLE = result;
+          } else if (typeof result === 'object' && result !== null) {
+            // For objects, try to extract the value
+            // With ethers v6, we might get the value directly
+            if (typeof result.toString === 'function' && result.toString().match(/^[0-9]+$/)) {
+              MAXTOKENPOSSIBLE = result;
+            } else {
+              // Attempt to extract value based on common patterns
+              MAXTOKENPOSSIBLE = result[0] || result.amountOut || result._hex || result.value || result;
+            }
+          }
+          
+          console.log(`Found valid Uniswap v4 MAXTOKEN POSSIBLE: ${MAXTOKENPOSSIBLE.toString()}`);
+
+        // CONVERT TO REGULAR NUMBER FOR LOOP
+        if (typeof MAXTOKENPOSSIBLE === 'bigint') {
+          maxTokenPossible = Number(MAXTOKENPOSSIBLE);
+        } else if (MAXTOKENPOSSIBLE._isBigNumber || MAXTOKENPOSSIBLE instanceof ethers.BigNumber) {
+          // For ethers v5
+          maxTokenPossible = MAXTOKENPOSSIBLE.toNumber();
+        } else if (typeof MAXTOKENPOSSIBLE.toString === 'function') {
+          // For ethers v6 or other BigInt-like objects
+          maxTokenPossible = Number(MAXTOKENPOSSIBLE.toString());
+        } else {
+          maxTokenPossible = Number(MAXTOKENPOSSIBLE);
+        }
+
+        console.log(`Converted to number for loop: ${maxTokenPossible}`);
+        } catch (error) {
+          console.error(`Error finding valid getMaxUniswapIDPossible for swap:`, error);
+        }
 
 
 
 
 
 
+
+
+
+
+  let feesOwedToken1 = [];
+  let feesOwedToken2 = [];
 
 let fees0 = 0;
 let fees1 = 0;
 
+try {
+  const maxLoopLookups = 1000;
+  var startSearchAt = 0; // Start searching from token ID 0
+  const totalRange = maxTokenPossible - startSearchAt;
+  const NumberOfLoops = Math.ceil(totalRange / maxLoopLookups);
+  
+  // Initialize as empty arrays (not undefined)
+  let ownedTokenIds = [];
+  let OWNEDtOKEN1 = [];
+  let OWNEDtOKEN2 = [];
+  let liquidity = [];
+  let poolKeyi = [];
+  let poolInfoi = [];
+  
+  for (let x = 0; x < NumberOfLoops; x++) {
+    const startId = startSearchAt + (maxLoopLookups * x);
+    const endId = Math.min(startId + maxLoopLookups - 1, maxTokenPossible);
+    
+    console.log("Looking at NFT ids in this search IDS:", startId, "to", endId);
+    
+    const result = await positionFinder.findUserTokenIds(
+      tokenAddress_Swapper,
+      NFTTOkenID, 
+      NFTTOkenID, 
+      tokenAddress, 
+      Address_ZEROXBTC_TESTNETCONTRACT,
+      HookAddress
+    );
+    
+    // Concatenate arrays properly using spread operator or concat
+    ownedTokenIds = ownedTokenIds.concat(result[0]);
+    OWNEDtOKEN1 = OWNEDtOKEN1.concat(result[1]);
+    OWNEDtOKEN2 = OWNEDtOKEN2.concat(result[2]);
+    liquidity = liquidity.concat(result[3]);
+    feesOwedToken1 = feesOwedToken1.concat(result[4]);
+    feesOwedToken2 = feesOwedToken2.concat(result[5]);
+    console.log("fees in loop = ",result[4]);
+    console.log("fees in loop = ",result[5]);
+    poolKeyi = poolKeyi.concat(result[6]);
+    poolInfoi = poolInfoi.concat(result[7]);
 
-      try {
-        // Call the view function
-        // Call the view function
-          const result = await tokenSwapper.findPosition(tokenAddress, Address_ZEROXBTC_TESTNETCONTRACT, HookAddress, NFTTOkenID);
+  }
 
-                  
-          // Destructure the result
-          const poolIDZ = result[0];  // bytes32 pool ID
-          const positionId = result[1];  // bytes32 position ID
-          fees0 = result[2];       // uint256 fees for token0
-          fees1 = result[3];       // uint256 fees for token1
-          const salt = result[4];      // boolean indicating if position exists
-
-          console.log("POOL ID:", poolIDZ);
-          console.log("Position ID:", positionId);
-          console.log("Fees Token0:", fees0.toString());
-          console.log("Fees Token1:", fees1.toString());
-          console.log("Pos salt:", salt);
         } catch (error) {
-          console.error(`Error findPosition:`, error);
+          console.error(`Error finding valid positionFinder.findUserTokenIds:`, error);
         }
 
+
+
+fees0 = feesOwedToken2[0];
+fees1 = feesOwedToken1[0];
+console.log("Fees0: ",fees0);
+console.log("fees1: ",fees1);
 
 
 await sleep(5);
