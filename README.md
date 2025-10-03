@@ -6,3 +6,8 @@ npx hardhat compile
 npx hardhat run scripts/deploy.js --network baseSepolia
 
 
+npx hardhat run scripts/deploy_only_B0x_MainnetETH.js --network ethereum
+
+
+npx hardhat run scripts/deploy_only_B0x_MainnetBase.js --network ethereum
+
